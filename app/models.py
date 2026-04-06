@@ -5,7 +5,7 @@ class Recipe(db.Model):
     __tablename__ = 'recipe'
     id = db.Column(db.Integer, primary_key=True)
     user_email = db.Column(db.String(64), db.ForeignKey('user.email'), nullable=False)
-    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False, )
+    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=True, )
     title = db.Column(db.String(64), nullable=False)
     prep_time = db.Column(db.Integer, nullable = False)
     cook_time = db.Column(db.Integer, nullable=False)
