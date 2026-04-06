@@ -18,7 +18,18 @@
         {{ form.cook_time.label }}<br>
         {{ form.cook_time(size=32) }}
     </p>
-
+    <h3>Ingredients</h3>
+    <div id="ingredients">
+        {% for ingredient in form.ingredients %}
+        <div class="ingredient_row">
+  		{{ ingredient.num.label }} {{ingredient.num(size=5) }}
+		{{ ingredient.ingredient_name.label }} {{ingredient.ingredient_name(size=20) }}
+		{{ ingredient.unit.label }} {{ ingredient.unit(size=10) }}
+	</div>
+	{% endfor %}
+    </div>
+    <button type="button" onclick="addIngredient()">Add Ingredient</button>
+    <br>
     <p>
         {{ form.body.label }}<br>
         {{ form.body(rows=6, cols=60) }}
@@ -41,4 +52,22 @@
 
     <p>{{ form.submit() }}</p>
 </form>
+<script>
+	let ingredientCount = {{form.ingredients | length }}
+	function addIngredient() {
+		const container = document.getElementById('ingredients');
+		const div= document.createElement('div');
+		div.classList.add('ingredient_row');
+		div.innerHTML = ` 
+			<label>Quantity:</label>
+            		<input type="number" name="ingredients-${ingredientCount}-num" size="5">
+           		 <label>Name:</label>
+           		 <input type="text" name="ingredients-${ingredientCount}-ingredient_name" size="20">
+            		<label>Unit:</label>
+            		<input type="text" name="ingredients-${ingredientCount}-unit" size="10">
+        `;
+        container.appendChild(div);
+        ingredientCount++;
+    }
+</script>
 {% endblock %}

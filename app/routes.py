@@ -2,7 +2,7 @@ from app import app
 from flask import render_template, redirect, url_for
 from app.forms import CreateRecipe
 from app import db
-from app.models import Recipe
+from app.models import Recipe, Ingredient
 import sys
 from datetime import datetime
 
@@ -28,6 +28,10 @@ def add_recipe():
 
         # add record to table and commit changes
         db.session.add(c)
+        db.session.flush()
+        for ingredient in form.ingredients.data:
+            if ingredient['ingredient_name']:
+                i = Ingredient(recipe_id=c.id, name=ingredient['ingredient_name'], num=ingredient['num'], units=ingredient['unit'])
         db.session.commit()
         form.title.data=''
         form.prep_time.data=''
