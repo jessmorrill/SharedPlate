@@ -24,7 +24,7 @@ def add_recipe():
         category = form.category.data
         
         # Create a city record to store in the DB
-        c = Recipe(user_email="placeholder", title=title, prep_time=prep_time, cook_time=cook_time, body=body, category=category,num_serves=num_serves, privacy_setting=privacy, is_validated=True, date_posted=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        c = Recipe(user_email="placeholder",group_id=1, title=title, prep_time=prep_time, cook_time=cook_time, body=body, category=category,num_serves=num_serves, privacy_setting=privacy, is_validated=True, date_posted=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
         # add record to table and commit changes
         db.session.add(c)
