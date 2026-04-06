@@ -1,17 +1,44 @@
 {% extends "base.html" %}
-
 {% block content %}
-    <h2>Input info</h2>
-    <form action="" method="post" novalidate>
-        {{ form.hidden_tag() }}
-        <p>
-            {{ form.city.label }}<br>
-            {{ form.city(size=32) }}
-        </p>
-        <p>
-            {{ form.population.label }}<br>
-            {{ form.population(size=32) }}
-        </p>
-        <p>{{ form.submit() }}</p>
-    </form>
+<h2>Create a Recipe</h2>
+<form action="" method="post" novalidate>
+    {{ form.hidden_tag() }}
+
+    <p>
+        {{ form.title.label }}<br>
+        {{ form.title(size=32) }}
+    </p>
+
+    <p>
+        {{ form.prep_time.label }}<br>
+        {{ form.prep_time(size=32) }}
+    </p>
+
+    <p>
+        {{ form.cook_time.label }}<br>
+        {{ form.cook_time(size=32) }}
+    </p>
+
+    <p>
+        {{ form.body.label }}<br>
+        {{ form.body(rows=6, cols=60) }}
+    </p>
+
+    <p>
+        {{ form.num_serves.label }}<br>
+        {{ form.num_serves(size=32) }}
+    </p>
+
+    <p>
+        {{ form.privacy.label }}<br>
+        {{ form.privacy() }}
+    </p>
+
+    <p>
+        {{ form.category.label }}<br>
+        {{ form.category() }}
+    </p>
+
+    <p>{{ form.submit() }}</p>
+</form>
 {% endblock %}
