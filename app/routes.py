@@ -8,7 +8,7 @@ from datetime import datetime
 
 @app.route('/')
 def home():
-    recipes = Recipe.query.filter_by(privacy='public').all()
+    recipes = Recipe.query.filter_by(privacy_setting='public').all()
     return render_template('index.html', recipes=recipes)
 
 @app.route('/create-recipe', methods=['GET', 'POST'])
