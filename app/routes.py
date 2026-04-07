@@ -69,7 +69,7 @@ def add_group():
         db.session.flush()
         db.session.commit()
         form.group_name.data=''
-        form.group_privacy.data=''
-        return redirect(url_for('create_group'))
+        form.privacy.data=''
+        return redirect(url_for('add_group'))
     return render_template('create_group.html',form=form)
 
