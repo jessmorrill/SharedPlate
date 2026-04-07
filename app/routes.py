@@ -1,8 +1,9 @@
 from app import app
+from flask import session
 from flask import render_template, redirect, url_for, request
 from app.forms import CreateRecipe, SearchRecipe, CreateGroup, SearchGroup
 from app import db
-from app.models import Recipe, Ingredient, Group
+from app.models import Recipe, Ingredient, Group, User
 import sys
 from datetime import datetime
 
@@ -83,3 +84,48 @@ def add_group():
         form.privacy.data=''
         return redirect(url_for('add_group'))
     return render_template('create_group.html',form=form)
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        existing = User.query.filter_by(email=email).first()
+        if not existing:
+            new_user = User(
+                email=email,
+                username=username,
+                password=password,
+                date_joined=datetime.now().strftime("%Y-%m-%d"),
+                isPending=False
+            )
+            db.session.add(new_user)
+            db.session.commit()
+
+            session['user'] = email
+            return redirect(url_for('home'))
+
+    return render_template('register.html')
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        user = User.query.filter_by(email=email, password=password).first()
+
+        if user:
+            session['user'] = user.email
+            return redirect(url_for('home'))
+
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    return redirect(url_for('home'))

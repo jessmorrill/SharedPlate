@@ -38,6 +38,15 @@
     <a href="/">Home</a>
     <a href="/create-recipe">Create Recipe</a>
     <a href="/create-group">Create Group</a>
+    <a href="/login">Login</a>
+    <a href="/register">Register</a>
+    <a href="/logout">Logout</a>
+
+    {% if session.get('user') %}
+        <span style="color:white; margin-left:20px;">
+            Logged in as {{ session['user'] }}
+        </span>
+    {% endif %}
 </div>
 
 <div class="container">
