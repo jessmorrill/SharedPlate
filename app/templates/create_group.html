@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Create a Group</h2>
+<form action="" method="post"  autocomplete="off">
+    {{ form.hidden_tag() }}
+
+    <p>
+        {{ form.group_name.label }}<br>
+        {{ form.group_name(size=32) }}
+    </p>
+
+    <p>
+        {{ form.privacy.label }}<br>
+        {{ form.privacy(size=32) }}
+    </p>
+
+    <p>
+	{{form.submit() }}
+    </p>
+</form>
+{% endblock %}

@@ -1,8 +1,8 @@
 from app import app
 from flask import render_template, redirect, url_for, request
-from app.forms import CreateRecipe, SearchRecipe
+from app.forms import CreateRecipe, SearchRecipe, CreateGroup
 from app import db
-from app.models import Recipe, Ingredient
+from app.models import Recipe, Ingredient, Group
 import sys
 from datetime import datetime
 
@@ -53,3 +53,23 @@ def add_recipe():
         form.category.data=''
         return redirect(url_for('add_recipe'))
     return render_template('add.html', form=form)
+
+@app.route('/create-group',methods=['GET', 'POST'])
+def add_group():
+    form = CreateGroup()
+    if form.validate_on_submit():
+        # Extract values from form
+        group_name = form.group_name.data
+        privacy = form.privacy.data
+
+        c = Group(group_name=group_name,privacy_setting=privacy)
+
+        # add record to table and commit changes
+        db.session.add(c)
+        db.session.flush()
+        db.session.commit()
+        form.group_name.data=''
+        form.group_privacy.data=''
+        return redirect(url_for('create_group'))
+    return render_template('create_group.html',form=form)
+

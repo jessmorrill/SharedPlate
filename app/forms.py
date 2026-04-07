@@ -22,3 +22,8 @@ class CreateRecipe(FlaskForm):
 class SearchRecipe(FlaskForm):
     search = StringField("Search recipes:", validators=[Optional()])
     submit = SubmitField('Search')
+
+class CreateGroup(FlaskForm):
+    group_name = StringField("Group Name:",validators=[DataRequired()])
+    privacy = RadioField("Visibility", choices = [("public","Visible to everyone"),("private","Visble to members")],validators=[DataRequired()])
+    submit = SubmitField("Create Group")
