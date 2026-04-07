@@ -20,8 +20,12 @@ class CreateRecipe(FlaskForm):
     submit = SubmitField('Create Recipe!')
 
 class SearchRecipe(FlaskForm):
-    search = StringField("Search recipes:", validators=[Optional()])
-    submit = SubmitField('Search')
+    searchA = StringField("Search recipes:", validators=[Optional()])
+    submitA = SubmitField('Search Recipes')
+
+class SearchGroup(FlaskForm):
+    searchB = StringField("Search groups:", validators=[Optional()])
+    submitB = SubmitField('Search Groups')
 
 class CreateGroup(FlaskForm):
     group_name = StringField("Group Name:",validators=[DataRequired()])

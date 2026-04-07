@@ -1,6 +1,6 @@
 from app import app
 from flask import render_template, redirect, url_for, request
-from app.forms import CreateRecipe, SearchRecipe, CreateGroup
+from app.forms import CreateRecipe, SearchRecipe, CreateGroup, SearchGroup
 from app import db
 from app.models import Recipe, Ingredient, Group
 import sys
@@ -9,16 +9,20 @@ from datetime import datetime
 @app.route('/', methods=['GET'])
 def home():
     form = SearchRecipe(request.args)
+    form2 = SearchGroup(request.args)
     recipes_query = Recipe.query.filter_by(privacy_setting='public')
     groups_query = Group.query.filter_by(privacy_setting='public')
-    if form.search.data and form.search.data.strip():
+    if form.searchA.data and form.searchA.data.strip():
         recipes_query = recipes_query.filter(
-            Recipe.title.ilike(f"%{form.search.data}%")
+            Recipe.title.ilike(f"%{form.searchA.data}%")
         )
-
+    if form2.searchB.data and form2.searchB.data.strip():
+        groups_query = groups_query.filter(
+            Group.group_name.ilike(f"%{form2.searchB.data}%")
+        )
     recipes = recipes_query.all()
     groups = groups_query.all()
-    return render_template('index.html', recipes=recipes, groups=groups, form=form)
+    return render_template('index.html', recipes=recipes, groups=groups, form=form, form2=form2)
 
 
 
