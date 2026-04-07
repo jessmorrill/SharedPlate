@@ -3,7 +3,23 @@
 {% block title %}Home-SharedPlate{% endblock %}
 
 {% block content %}
-  <h1>Public Recipes</h1>
+
+  <h1>Welcome to Shared Plate!</h1>
+
+  <h2> Create a Group</h2>
+
+  <form method="POST">
+      <input type="text" name="group_name" placeholder="Group Name" required>
+
+      <select name="privacy">
+          <option value="public">Public</option>
+          <option value="private>Private</option>
+      </select>
+
+      <button type="submit">Create Group</button>
+  </form>
+
+  <hr>
 
   <form method="get" action="{{ url_for('home') }}" autocomplete="off">
     {{ form.hidden_tag() }}
