@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Create a Recipe</h2>
-<form action="" method="post" novalidate>
+<form action="" method="post"  autocomplete="off">
     {{ form.hidden_tag() }}
 
     <p>
@@ -61,11 +61,11 @@
 		div.classList.add('ingredient_row');
 		div.innerHTML = ` 
 			<label>Quantity:</label>
-            		<input type="number" name="ingredients-${ingredientCount}-num" size="5">
+            		<input type="number" name="ingredients-${ingredientCount}-num" size="5" autocomplete="off">
            		 <label>Unit:</label>
-           		 <input type="text" name="ingredients-${ingredientCount}-unit" size="10">
+           		 <input type="text" name="ingredients-${ingredientCount}-unit" size="10" autocomplete="off">
             		<label>Ingredient:</label>
-            		<input type="text" name="ingredients-${ingredientCount}-ingredient_name" size="20">
+            		<input type="text" name="ingredients-${ingredientCount}-ingredient_name" size="20" autocomplete="off">
         `;
         container.appendChild(div);
         ingredientCount++;
