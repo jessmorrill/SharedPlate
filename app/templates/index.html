@@ -3,7 +3,10 @@
 {% block title %}Home-SharedPlate{% endblock %}
 
 {% block content %}
-  <h1>Public Recipes</h1>
+
+  <h1>Welcome to Shared Plate!</h1>
+
+  <hr>
 
   <form method="get" action="{{ url_for('home') }}" autocomplete="off">
     {{ form.hidden_tag() }}

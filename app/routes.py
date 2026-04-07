@@ -72,4 +72,3 @@ def add_group():
         form.privacy.data=''
         return redirect(url_for('add_group'))
     return render_template('create_group.html',form=form)
-
