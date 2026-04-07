@@ -6,14 +6,31 @@ from app.models import Recipe, Ingredient, Group
 import sys
 from datetime import datetime
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET', 'POST'])
 def home():
     form = SearchRecipe(request.args)
+    if request.method == 'POST':
+        name = request.form.get('group_name')
+        privacy = request.form.get('privacy')
+
+        if name and privacy:
+            g = Group(group_name=name, privacy_setting=privacy)
+            db.session.add(g)
+            db.session.commit()
+
+        return redirect(url_for('home'))
+
     recipes_query = Recipe.query.filter_by(privacy_setting='public')
+
     if form.search.data and form.search.data.strip():
-        recipes_query = recipes_query.filter(Recipe.title.ilike(f"%{form.search.data}%"))
+        recipes_query = recipes_query.filter(
+            Recipe.title.ilike(f"%{form.search.data}%")
+        )
+
     recipes = recipes_query.all()
     return render_template('index.html', recipes=recipes, form=form)
+
+
 
 @app.route('/recipe/<int:recipe_id>', methods=['GET'])
 def recipe_detail(recipe_id):
