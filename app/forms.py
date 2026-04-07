@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SubmitField, RadioField, TextAreaField, FieldList, FormField
-from wtforms.validators import DataRequired, Optional, NumberRange
+from wtforms.validators import DataRequired, Optional, NumberRange, InputRequired
 from wtforms import Form
 
 class IngredientForm(Form):
@@ -10,8 +10,8 @@ class IngredientForm(Form):
 
 class CreateRecipe(FlaskForm):
     title = StringField("Recipe Title:",validators=[DataRequired()])
-    prep_time = IntegerField("Prep Time (minutes):",validators=[DataRequired(), NumberRange(min=0, message="Cannot be negative")])
-    cook_time = IntegerField("Cook Time (minutes):",validators=[DataRequired(), NumberRange(min=0, message="Cannot be negative")])
+    prep_time = IntegerField("Prep Time (minutes):",validators=[InputRequired(), NumberRange(min=0, message="Cannot be negative")])
+    cook_time = IntegerField("Cook Time (minutes):",validators=[InputRequired(), NumberRange(min=0, message="Cannot be negative")])
     body = TextAreaField("Instructions:",validators=[DataRequired()])
     num_serves = IntegerField("Number of Servings:",validators=[DataRequired(), NumberRange(min=1, message="Must be at least 1")])
     ingredients = FieldList(FormField(IngredientForm), min_entries=1)
