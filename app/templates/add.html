@@ -23,8 +23,9 @@
         {% for ingredient in form.ingredients %}
         <div class="ingredient_row">
   		{{ ingredient.num.label }} {{ingredient.num(size=5) }}
-		{{ ingredient.ingredient_name.label }} {{ingredient.ingredient_name(size=20) }}
 		{{ ingredient.unit.label }} {{ ingredient.unit(size=10) }}
+        {{ ingredient.ingredient_name.label }} {{ingredient.ingredient_name(size=20) }}
+
 	</div>
 	{% endfor %}
     </div>
@@ -61,10 +62,10 @@
 		div.innerHTML = ` 
 			<label>Quantity:</label>
             		<input type="number" name="ingredients-${ingredientCount}-num" size="5">
-           		 <label>Name:</label>
-           		 <input type="text" name="ingredients-${ingredientCount}-ingredient_name" size="20">
-            		<label>Unit:</label>
-            		<input type="text" name="ingredients-${ingredientCount}-unit" size="10">
+           		 <label>Unit:</label>
+           		 <input type="text" name="ingredients-${ingredientCount}-unit" size="10">
+            		<label>Ingredient:</label>
+            		<input type="text" name="ingredients-${ingredientCount}-ingredient_name" size="20">
         `;
         container.appendChild(div);
         ingredientCount++;

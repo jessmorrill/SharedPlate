@@ -5,7 +5,7 @@ from wtforms import Form
 
 class IngredientForm(Form):
     num= IntegerField("Quantity:", validators=[Optional()])
-    ingredient_name = StringField("Name:", validators=[Optional()])
+    ingredient_name = StringField("Ingredient:", validators=[Optional()])
     unit = StringField("Unit:", validators=[Optional()])
 
 class CreateRecipe(FlaskForm):
