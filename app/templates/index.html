@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Home-SharedPlate{% endblock %}
+
+{% block content %}
+  <h1>Public Recipes</h1>
+
+  {% if recipes %}
+    <ul class="recipes">
+      {% for recipe in recipes %}
+        <li class="recipe" style="border:1px solid black;">
+          <h2>{{ recipe.title }}</h2>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No public recipes yet. <a href="{{ url_for('add_recipe') }}">Add one</a>.</p>
+  {% endif %}
+{% endblock %}
