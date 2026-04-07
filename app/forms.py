@@ -18,3 +18,7 @@ class CreateRecipe(FlaskForm):
     privacy = RadioField("Privacy Settings:", choices = [("public", "Visible to Everyone"), ("private", "Visible to Group Only"), ("unlisted", "Visible to Me Only")],validators=[DataRequired()])
     category = RadioField("Category:", choices = [("appetizer", "Appetizer"), ("breakfast", "Breakfast"), ("lunch", "Lunch"), ("dinner", "Dinner"), ("dessert", "Dessert")],validators=[DataRequired()])
     submit = SubmitField('Create Recipe!')
+
+class SearchRecipe(FlaskForm):
+    search = StringField("Search recipes:", validators=[Optional()])
+    submit = SubmitField('Search')

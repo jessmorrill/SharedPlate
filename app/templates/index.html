@@ -5,10 +5,16 @@
 {% block content %}
   <h1>Public Recipes</h1>
 
+  <form method="get" action="{{ url_for('home') }}">
+    {{ form.hidden_tag() }}
+    {{ form.search(placeholder='Search') }}
+    {{ form.submit }}
+  </form>
+
   {% if recipes %}
     <ul class="recipes">
       {% for recipe in recipes %}
-        <li class="recipe" style="border:1px solid black;">
+        <li class="recipe">
           <h2>{{ recipe.title }}</h2>
         </li>
       {% endfor %}
