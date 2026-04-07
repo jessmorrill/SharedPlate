@@ -15,6 +15,12 @@ def home():
     recipes = recipes_query.all()
     return render_template('index.html', recipes=recipes, form=form)
 
+@app.route('/recipe/<int:recipe_id>', methods=['GET'])
+def recipe_detail(recipe_id):
+    recipe = Recipe.query.get_or_404(recipe_id)
+    ingredients = Ingredient.query.filter_by(recipe_id=recipe_id).all()
+    return render_template('recipe_detail.html', recipe=recipe, ingredients=ingredients)
+
 @app.route('/create-recipe', methods=['GET', 'POST'])
 def add_recipe():
     form = CreateRecipe()
@@ -36,6 +42,7 @@ def add_recipe():
         for ingredient in form.ingredients.data:
             if ingredient['ingredient_name']:
                 i = Ingredient(recipe_id=c.id, name=ingredient['ingredient_name'], num=ingredient['num'], units=ingredient['unit'])
+                db.session.add(i)
         db.session.commit()
         form.title.data=''
         form.prep_time.data=''
