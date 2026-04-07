@@ -1,26 +1,49 @@
+<!DOCTYPE html>
 <html>
-    <head>
-      <style>
-        table, th, td {
-          border: 1px solid black;
-          border-collapse: collapse;
-        }
-        th, td {
-          padding: 5px;
-        }
-        th {
-          text-align: left;
-        }
-        </style>
-        <title>Shared Plate</title>
-    </head>
+<head>
+    <title>{% block title %}Shared Plate{% endblock %}</title>
 
-    <body>
-        <div>
-          <a href="/">Home</a>
-	  <a href="/create-recipe">Create Recipe</a>
-        </div>
-        <hr>
-        {% block content %}{% endblock %}
-    </body>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+        }
+
+        .navbar {
+            background-color: #333;
+            overflow: hidden;
+            padding: 10px;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <a href="/">Home</a>
+    <a href="/create-recipe">Create Recipe</a>
+    <a href="/groups">Groups</a>
+    <a href="/create-group">Create Group</a>
+</div>
+
+<div class="container">
+    {% block content %}{% endblock %}
+</div>
+
+</body>
 </html>
