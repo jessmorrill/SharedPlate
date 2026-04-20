@@ -46,7 +46,7 @@ def add_recipe():
         privacy = form.privacy.data
         category = form.category.data
         
-        c = Recipe(user_email="placeholder",group_id=1, title=title, prep_time=prep_time, cook_time=cook_time, body=body, category=category,num_serves=num_serves, privacy_setting=privacy, is_validated=True, date_posted=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        c = Recipe(user_email=session.get('user'), group_id=1, title=title, prep_time=prep_time, cook_time=cook_time, body=body, category=category,num_serves=num_serves, privacy_setting=privacy, is_validated=True, date_posted=datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
         # add record to table and commit changes
         db.session.add(c)
@@ -100,13 +100,13 @@ def register():
                 username=username,
                 password=password,
                 date_joined=datetime.now().strftime("%Y-%m-%d"),
-                isPending=False
+                isPending=True
             )
             db.session.add(new_user)
             db.session.commit()
 
             session['user'] = email
-            return redirect(url_for('home'))
+            return redirect(url_for('register', email=email))
 
     return render_template('register.html')
 
@@ -119,7 +119,7 @@ def login():
 
         user = User.query.filter_by(email=email, password=password).first()
 
-        if user:
+        if user and not user.isPending:
             session['user'] = user.email
             return redirect(url_for('home'))
 
@@ -129,3 +129,12 @@ def login():
 def logout():
     session.pop('user', None)
     return redirect(url_for('home'))
+
+@app.route('/verify/<email>')
+def verify(email):
+    user = User.query.filter_by(email=email).first()
+
+    if user:
+        user.isPending = False
+        db.session.commit()
+    return redirect(url_for('login'))

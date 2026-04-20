@@ -16,3 +16,14 @@
 
     <button type="submit">Register</button>
 </form>
+
+{% if request.args.get('email') %}
+<p style="margin-top:20px; color:green;">
+    Account created! Click below to verify:
+</p>
+
+<a href="/verify/{{ request.args.get('email') }}">
+    Verify Account
+</a>
+{% endif %}
+{% endblock %}
