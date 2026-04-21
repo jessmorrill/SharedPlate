@@ -7,40 +7,51 @@
   <h1>Welcome to SharedPlate!</h1>
 
   <hr>
-<h2> Public Recipes </h2>
-  <form method="get" action="{{ url_for('home') }}" autocomplete="off">
-    {{ form.hidden_tag() }}
-    {{ form.searchA(placeholder='Search') }}
-    {{ form.submitA }}
-  </form>
+<div style="margin-botton:40px;">
+    <h2> Public Recipes </h2>
+        <form method="get" action="{{ url_for('home') }}" autocomplete="off">
+            {{ form.hidden_tag() }}
+            {{ form.searchA(placeholder='Search') }}
+            {{ form.submitA }}
+        </form>
 
-  {% if recipes %}
-    <ul class="recipes">
-      {% for recipe in recipes %}
-        <li class="recipe">
-          <h2><a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}">{{ recipe.title }}</a></h2>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>No Public Recipes</p>
-  {% endif %}
-  <form method="get" action="{{ url_for('home') }}" autocomplete="off">
-    {{ form2.hidden_tag() }}
-    {{ form2.searchB(placeholder='Search') }}
-    {{ form2.submitB }}
-  </form>
-<h2> Public Groups </h2>
-  {% if groups %}
-    <ul class="groups">
-      {% for group in groups %}
-        <li class="group">
-          <h2> {{ group.group_name }} </h2>
-        </li>
-      {% endfor %}
-    </ul>
-  {% else %}
-    <p>No Public Groups</p>
-  {% endif %}
+        {% if recipes %}
+
+            <ul class="recipes">
+                {% for recipe in recipes %}
+                    <li>
+                        <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}">
+                            {{ recipe.title }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No Public Recipes</p>
+        {% endif %}
+</div>
+
+<hr>
+<div style="margin-top:40px;">
+    <h2> Public Groups</h2>
+
+    <form method="get" action="{{ url_for('home') }}" autocomplete="off">
+        {{ form2.hidden_tag() }}
+        {{ form2.searchB(placeholder='Search') }}
+        {{ form2.submitB }}
+    </form>
+
+    {% if groups %}
+        <ul style="list-style:none;padding:0;">
+            {% for group in groups %}
+                <li style="margin:10px 0; padding:10px; border:1px solid #odd; border-radius:8px;>
+                    {{ group.group_name }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No Public Groups</p>
+    {% endif %}
+</div>
 
 {% endblock %}
