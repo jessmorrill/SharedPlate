@@ -41,7 +41,7 @@
     {% if session.get('user') %}
         <a href="/logout">Logout</a>
         <span style="color:white; margin-left:20px;">
-            Logged in as {{ session['user'] }}
+            <a href="/profile">Profile</a>
         </span>
     {% else %}
         <a href="/login">Login</a>

@@ -138,3 +138,7 @@ def verify(email):
         user.isPending = False
         db.session.commit()
     return redirect(url_for('login'))
+@app.route('/profile')
+def userdash():
+    user = session['user']
+    return user
