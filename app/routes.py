@@ -7,6 +7,13 @@ from app.models import Recipe, Ingredient, Group, User
 import sys
 from datetime import datetime
 
+def get_current_user():
+    """Helper to get User object from session email."""
+    email = session.get('user')
+    if email:
+        return User.query.filter_by(email=email).first()
+    return None
+
 @app.route('/', methods=['GET'])
 def home():
     form = SearchRecipe(request.args)
@@ -138,3 +145,36 @@ def verify(email):
         user.isPending = False
         db.session.commit()
     return redirect(url_for('login'))
+
+@app.route('/dashboard')
+def dashboard():
+    user = get_current_user()
+    if not user:
+        return redirect(url_for('login'))
+    recipes = Recipe.query.filter_by(user_email=user.email).all()
+    memberships = Group_Membership.query.filter_by(user_email=user.email).all()
+    groups = [m.group for m in memberships]
+    return render_template('dashboard.html', user=user, recipes=recipes, groups=groups)
+
+@app.route('/group/<int:group_id>-<string:group_name>')
+def group_detail(group_id, group_name):
+    user = get_current_user()
+    if not user:
+        return redirect(url_for('login'))
+    group = Group.query.get_or_404(group_id)
+    membership = Group_Membership.query.filter_by(
+        user_email=user.email,
+        group_id=group.id
+    ).first_or_404()
+    recipes = Recipe.query.filter_by(group_id=group.id).all()
+    return render_template('group_page.html', group=group, recipes=recipes)
+
+    membership = Group_Membership.query.filter_by(
+        user_email=user.email,
+        group_id=group.id
+    ).first_or_404()
+
+    recipes = Recipe.query.filter_by(group_id=group.id).all()
+
+    return render_template('group_detail.html', group=group, recipes=recipes, user=user)
+>>>>>>> Stashed changes
