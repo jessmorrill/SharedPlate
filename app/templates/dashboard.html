@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>{{ user.username }}</h1>
+<p>{{ user.email }} — joined {{ user.date_joined }}</p>
+
+<h2>Your Recipes</h2>
+{% if recipes %}
+  <ul>
+    {% for recipe in recipes %}
+      <li><a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}">{{ recipe.title }}</a></li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>You haven't posted any recipes yet.</p>
+{% endif %}
+
+<h2>Your Groups</h2>
+{% if groups %}
+  <ul>
+    {% for group in groups %}
+      <li>
+        <a href="{{ url_for('group_detail', group_id=group.id, group_name=group.group_name) }}">
+          {{ group.group_name }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>You haven't joined any groups yet.</p>
+{% endif %}
+
+{% endblock %}

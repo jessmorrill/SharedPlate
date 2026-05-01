@@ -177,4 +177,3 @@ def group_detail(group_id, group_name):
     recipes = Recipe.query.filter_by(group_id=group.id).all()
 
     return render_template('group_detail.html', group=group, recipes=recipes, user=user)
->>>>>>> Stashed changes
