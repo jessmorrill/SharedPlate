@@ -1,59 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{% block title %}Shared Plate{% endblock %}</title>
-
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-        }
-
-        .navbar {
-            background-color: #333;
-            overflow: hidden;
-            padding: 10px;
-        }
-
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            margin-right: 15px;
-            font-weight: bold;
-        }
-
-        .navbar a:hover {
-            text-decoration: underline;
-        }
-
-        .container {
-            padding: 20px;
-        }
-    </style>
+  <title>{% block title %}Shared Plate{% endblock %}</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; }
+    .navbar { background-color: #333; overflow: hidden; padding: 10px; }
+    .navbar a { color: white; text-decoration: none; margin-right: 15px; font-weight: bold; }
+    .navbar a:hover { text-decoration: underline; }
+    .container { padding: 20px; }
+  </style>
 </head>
-
 <body>
-
 <div class="navbar">
-    <a href="/">Home</a>
-    <a href="/create-recipe">Create Recipe</a>
-    <a href="/create-group">Create Group</a>
-    {% if session.get('user') %}
-        <a href="/logout">Logout</a>
-        <span style="color:white; margin-left:20px;">
-            Logged in as {{ session['user'] }}
-        </span>
-    {% else %}
-        <a href="/login">Login</a>
-        <a href="/register">Register</a>
-    </span>
-    {% endif %}
-
+  <a href="/">Home</a>
+  <a href="/create-recipe">Create Recipe</a>
+  <a href="/create-group">Create Group</a>
+  {% if session.get('user') %}
+    <a href="{{ url_for('logout') }}">Logout</a>
+    <a href="{{ url_for('dashboard') }}" style="color:white; margin-left:20px;">
+      {{ current_user.username if current_user else session['user'] }}
+    </a>
+  {% else %}
+    <a href="{{ url_for('login') }}">Login</a>
+    <a href="{{ url_for('register') }}">Register</a>
+  {% endif %}
 </div>
-
 <div class="container">
-    {% block content %}{% endblock %}
+  {% block content %}{% endblock %}
 </div>
-
 </body>
 </html>
