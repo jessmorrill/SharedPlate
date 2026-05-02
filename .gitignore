@@ -1,1 +1,4 @@
 .flaskenv
+__pycache__/
+*.pyc
+*.db
