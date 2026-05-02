@@ -168,8 +168,7 @@ def login():
 def logout():
     session.pop('user', None)
     return redirect(url_for('home'))
-
-
+  
 @app.route('/dashboard')
 def dashboard():
     user = get_current_user()
@@ -179,7 +178,6 @@ def dashboard():
     memberships = Group_Membership.query.filter_by(user_email=user.email).all()
     groups = [m.group for m in memberships]
     return render_template('dashboard.html', user=user, recipes=recipes, groups=groups)
-
 
 @app.route('/group/<int:group_id>-<string:group_name>')
 def group_detail(group_id, group_name):

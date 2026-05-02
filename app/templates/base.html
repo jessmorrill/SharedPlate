@@ -12,18 +12,18 @@
 </head>
 <body>
 <div class="navbar">
-  <a href="/">Home</a>
-  <a href="/create-recipe">Create Recipe</a>
-  <a href="/create-group">Create Group</a>
-  {% if session.get('user') %}
-    <a href="{{ url_for('logout') }}">Logout</a>
-    <a href="{{ url_for('dashboard') }}" style="color:white; margin-left:20px;">
-      {{ current_user.username if current_user else session['user'] }}
-    </a>
-  {% else %}
-    <a href="{{ url_for('login') }}">Login</a>
-    <a href="{{ url_for('register') }}">Register</a>
-  {% endif %}
+<a href="/">Home</a>
+<a href="/create-recipe">Create Recipe</a>
+<a href="/create-group">Create Group</a>
+{% if session.get('user') %}
+  <a href="{{ url_for('logout') }}">Logout</a>
+  <a href="{{ url_for('dashboard') }}" style="color:white; margin-left:20px;">
+    {{ current_user.username if current_user else session['user'] }}
+  </a>
+{% else %}
+  <a href="{{ url_for('login') }}">Login</a>
+  <a href="{{ url_for('register') }}">Register</a>
+{% endif %}
 </div>
 <div class="container">
   {% block content %}{% endblock %}
