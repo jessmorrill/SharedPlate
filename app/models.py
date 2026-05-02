@@ -16,7 +16,9 @@ class Recipe(db.Model):
     is_validated = db.Column(db.Boolean, nullable=True)
     date_posted = db.Column(db.TEXT, nullable=False)
     forked_from_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), nullable=True)
-
+    ingredients = db.relationship('Ingredient', backref='recipe', lazy=True)
+    author = db.relationship('User', foreign_keys=[user_email], backref='recipes')
+    
 class User(db.Model):
     __tablename__ = 'user'
     email = db.Column(db.String(64), primary_key=True)
@@ -24,13 +26,16 @@ class User(db.Model):
     password = db.Column(db.String(64), nullable = False)
     date_joined = db.Column(db.TEXT, nullable=False)
     isPending = db.Column(db.Boolean, nullable=False)
-
+    memberships = db.relationship('Group_Membership', backref='user', lazy=True)
+    
 class Group(db.Model):
     __tablename__ = 'group'
     id = db.Column(db.Integer, primary_key=True)
     group_name = db.Column(db.String(64), nullable=False)
     privacy_setting = db.Column(db.String(64), nullable=False)
-
+    memberships = db.relationship('Group_Membership', backref='group', lazy=True)
+    recipes = db.relationship('Recipe', backref='group', lazy=True)
+    
 class Group_Membership(db.Model):
     __tablename__ = 'group_membership'
     user_email = db.Column(db.String(64), db.ForeignKey('user.email'), primary_key=True)

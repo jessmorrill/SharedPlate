@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ group.group_name }} — SharedPlate{% endblock %}
+{% block content %}
+
+<h1>{{ group.group_name }}</h1>
+<p>{{ group.privacy_setting | capitalize }} group</p>
+
+{% if current_user %}
+  <a href="{{ url_for('add_recipe') }}">+ Post a Recipe</a>
+{% endif %}
+
+<h2>Recipes</h2>
+{% if recipes %}
+  <ul>
+    {% for recipe in recipes %}
+      <li>
+        <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}">{{ recipe.title }}</a>
+        — by {{ recipe.author.username if recipe.author else recipe.user_email }}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No recipes in this group yet.</p>
+{% endif %}
+
+{% endblock %}
