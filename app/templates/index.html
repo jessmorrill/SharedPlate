@@ -15,6 +15,7 @@
             {{ form.submitA }}
         </form>
 
+<<<<<<< HEAD
         {% if recipes %}
 
             <ul class="recipes">
@@ -53,5 +54,35 @@
         <p>No Public Groups</p>
     {% endif %}
 </div>
+=======
+  {% if recipes %}
+    <ul class="recipes">
+      {% for recipe in recipes %}
+        <li class="recipe">
+          <h2><a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}">{{ recipe.title }}</a></h2>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No Public Recipes</p>
+  {% endif %}
+  <form method="get" action="{{ url_for('home') }}" autocomplete="off">
+    {{ form2.hidden_tag() }}
+    {{ form2.searchB(placeholder='Search') }}
+    {{ form2.submitB }}
+  </form>
+<h2> Public Groups </h2>
+  {% if groups %}
+    <ul class="groups">
+      {% for group in groups %}
+        <li class="group">
+          <h2><a href="{{ url_for('group_detail', group_id=group.id, group_name=group.group_name) }}">{{ group.group_name }}</a></h2>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No Public Groups</p>
+  {% endif %}
+>>>>>>> 9c482996cbc4d1b6c2a4623e87c141be7e910837
 
 {% endblock %}
