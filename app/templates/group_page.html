@@ -7,10 +7,9 @@
 
 {% if membership %}
   {% if membership.role == 'creator' %}
-    <a href="{{ url_for('manage_requests', group_id=group.id) }}">Manage Join Requests</a>
-    <a href="{{ url_for('add_members', group_id=group.id) }}">Add Members</a>
+    <a href="{{ url_for('manage_requests', group_id=group.id) }}" class="btn">Manage Join Requests</a>
+    <a href="{{ url_for('add_members', group_id=group.id) }}" class="btn">Add Members</a>
   {% endif %}
-  <a href="{{ url_for('add_recipe', group_id=group.id) }}">+ Post a Recipe</a>
 {% elif group.privacy_setting == 'public' %}
   <form method="POST" action="{{ url_for('request_join', group_id=group.id) }}">
     <button type="submit">Join Group</button>
