@@ -209,9 +209,6 @@ def join_group():
         group_query = group_query.filter(Group.group_name.ilike(f"%{query}%"))
     groups = group_query.all()
 
-    if query and not groups:
-        flash('No groups found matching your search.', 'warning')  # FIX: fail case
-
     return render_template('join_group.html', form=form, groups=groups, membership_ids=membership_ids)
 
 
