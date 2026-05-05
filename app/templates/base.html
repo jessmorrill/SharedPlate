@@ -1,17 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-    {% for category, message in messages %}
-      <div class="alert alert-{{ category }}">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
-{% endwith %}
-  <title>{% block title %}Shared Plate{% endblock %}</title>
+<title>{% block title %}Shared Plate{% endblock %}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 <div class="navbar">
@@ -19,13 +12,20 @@
 <a href="/create-group">Create Group</a>
 <a href="{{ url_for('join_group') }}">Join Group</a>
 {% if session.get('user') %}
-  <a href="{{ url_for('logout') }}">Logout</a>
-  <a href="{{ url_for('dashboard') }}" style="color:white; margin-left:20px;">
+<a href="{{ url_for('logout') }}">Logout</a>
+<a href="{{ url_for('dashboard') }}" style="color:white; margin-left:20px;">
     {{ current_user.username if current_user else session['user'] }}
-  </a>
+</a>
 {% endif %}
 </div>
 <div class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
   {% block content %}{% endblock %}
 </div>
 </body>
