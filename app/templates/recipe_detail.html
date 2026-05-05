@@ -60,7 +60,7 @@
   <p>No comments yet.</p>
 {% endif %}
 
-{% if current_user and not user_review %}
+{% if current_user and not user_review and current_user.email != recipe.user_email %}
   <h2>Write a review</h2>
   <form method="POST" action="{{ url_for('submit_review', recipe_id=recipe.id) }}">
     <p>
