@@ -23,19 +23,35 @@ def inject_current_user():
     return {'current_user': None}
 
 
+def clear_pending_registration():
+    pending_email = session.pop('pending_verify_email', None)
+    session.pop('verify_code', None)
+    if pending_email:
+        pending_user = User.query.filter_by(email=pending_email, isPending=True).first()
+        if pending_user:
+            db.session.delete(pending_user)
+            db.session.commit()
+
+
 @app.before_request
 def require_login_or_register():
     allowed_paths = {'/login', '/register', '/forgot-password', '/reset-password', '/verify'}
     if request.endpoint == 'static':
         return
+
+    if session.get('pending_verify_email') and request.path != '/verify':
+        clear_pending_registration()
+
     if session.get('user'):
         return
+
     user_email = request.args.get('user')
     if user_email:
         existing = User.query.filter_by(email=user_email).first()
-        if existing:
+        if existing and not existing.isPending:
             session['user'] = existing.email
             return
+
     if request.path not in allowed_paths:
         return redirect(url_for('login'))
 
@@ -157,7 +173,7 @@ def register():
             db.session.add(new_user)
             db.session.commit()
 
-            session['user'] = email
+            session['pending_verify_email'] = email
             session['verify_code'] = code
 
             msg = Message('Your verification code', recipients=[email])
@@ -174,11 +190,14 @@ def verify():
     if request.method == 'POST':
         entered = request.form.get('code')
         if entered == session.get('verify_code'):
-            user = User.query.filter_by(email=session.get('user')).first()
+            pending_email = session.get('pending_verify_email')
+            user = User.query.filter_by(email=pending_email).first()
             if user:
                 user.isPending = False
                 db.session.commit()
                 session.pop('verify_code', None)
+                session.pop('pending_verify_email', None)
+                session['user'] = user.email
                 return redirect(url_for('home'))
         else:
             return render_template('verify.html', error='Incorrect code, try again.')
