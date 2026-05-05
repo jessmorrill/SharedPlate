@@ -1,4 +1,5 @@
 from app import app, db, mail
+from sqlalchemy import func
 from flask import session, render_template, redirect, url_for, request, flash
 from flask_mail import Message
 from app.forms import CreateRecipe, SearchRecipe, CreateGroup, SearchGroup
@@ -83,7 +84,9 @@ def recipe_detail(recipe_id):
     liked = False
     if user:
         liked = LikedRecipe.query.filter_by(user_email=user.email, recipe_id=recipe_id).first() is not None
-    return render_template('recipe_detail.html', recipe=recipe, ingredients=ingredients, liked=liked)
+    num_likes = db.session.query(func.count(LikedRecipe.recipe_id)).filter(LikedRecipe.recipe_id == recipe_id).scalar()
+    like_text = "like" if num_likes == 1 else "likes"
+    return render_template('recipe_detail.html', recipe=recipe, ingredients=ingredients, liked=liked, num_likes = num_likes, like_text=like_text)
 
 
 @app.route('/recipe/<int:recipe_id>/toggle_like', methods=['POST'])
@@ -177,7 +180,7 @@ def add_group():
             group_id=c.id,
             role='creator',
             notify_if_review=True,
-            notify_if_change=True
+            notify_if_like=True
         )
         db.session.add(membership)
         db.session.commit()
