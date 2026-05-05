@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Add Members to {{ group.group_name }}</h2>
+
+<form method="POST">
+    <label for="username">Search by Username:</label>
+    <input type="text" name="username" id="username" value="{{ search_query }}" required>
+    <button type="submit">Search</button>
+</form>
+
+{% if search_results %}
+<h3>Search Results</h3>
+<ul>
+{% for result in search_results %}
+<li>
+    {{ result.user.username }} ({{ result.user.email }})
+    {% if result.status == 'pending' %}
+        - Pending
+    {% else %}
+        <form method="POST" action="{{ url_for('invite_user', group_id=group.id, invitee_email=result.user.email) }}" style="display:inline;">
+            <button type="submit">Invite</button>
+        </form>
+    {% endif %}
+</li>
+{% endfor %}
+</ul>
+{% endif %}
+
+<a href="{{ url_for('group_detail', group_id=group.id, group_name=group.group_name) }}">Back to Group</a>
+
+{% endblock %}

@@ -5,10 +5,25 @@
 <h1>{{ group.group_name }}</h1>
 <p>{{ group.privacy_setting | capitalize }} group</p>
 
-{% if current_user %}
-  <a href="{{ url_for('add_recipe') }}">+ Post a Recipe</a>
+{% if membership %}
+  {% if membership.role == 'creator' %}
+    <a href="{{ url_for('manage_requests', group_id=group.id) }}">Manage Join Requests</a>
+    <a href="{{ url_for('add_members', group_id=group.id) }}">Add Members</a>
+  {% endif %}
+  <a href="{{ url_for('add_recipe', group_id=group.id) }}">+ Post a Recipe</a>
+{% elif group.privacy_setting == 'public' %}
+  <form method="POST" action="{{ url_for('request_join', group_id=group.id) }}">
+    <button type="submit">Join Group</button>
+  </form>
+{% elif can_request %}
+  <p><strong>{{ group.group_name }} created by {{ creator_username or 'Unknown' }}.</strong></p>
+  <p>This is a private group.</p>
+  <form method="POST" action="{{ url_for('request_join', group_id=group.id) }}">
+    <button type="submit">Request to Join</button>
+  </form>
 {% endif %}
 
+{% if membership or group.privacy_setting == 'public' %}
 <h2>Recipes</h2>
 {% if recipes %}
   <ul>
@@ -21,6 +36,7 @@
   </ul>
 {% else %}
   <p>No recipes in this group yet.</p>
+{% endif %}
 {% endif %}
 
 {% endblock %}

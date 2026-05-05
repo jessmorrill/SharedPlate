@@ -23,7 +23,7 @@
         {% for ingredient in form.ingredients %}
         <div class="ingredient_row">
   		{{ ingredient.num.label }} {{ingredient.num(size=5) }}
-		{{ ingredient.unit.label }} {{ ingredient.unit(size=10) }}
+		{{ ingredient.unit.label }} {{ ingredient.unit() }}
         {{ ingredient.ingredient_name.label }} {{ingredient.ingredient_name(size=20) }}
 
 	</div>
@@ -35,6 +35,11 @@
         {{ form.body.label }}<br>
         {{ form.body(rows=6, cols=60) }}
     </p>
+
+    <p>
+        <strong>Posting to group:</strong> {{ group.group_name }}
+    </p>
+    <input type="hidden" name="group_id" value="{{ group.id }}">
 
     <p>
         {{ form.num_serves.label }}<br>
@@ -63,12 +68,41 @@
 			<label>Quantity:</label>
             		<input type="number" name="ingredients-${ingredientCount}-num" size="5" autocomplete="off">
            		 <label>Unit:</label>
-           		 <input type="text" name="ingredients-${ingredientCount}-unit" size="10" autocomplete="off">
+           		 <select name="ingredients-${ingredientCount}-unit">
+           		     <option value="">None</option>
+           		     <option value="oz">Ounces</option>
+           		     <option value="cups">Cups</option>
+           		     <option value="tbsp">Tablespoons</option>
+           		     <option value="tsp">Teaspoons</option>
+           		     <option value="lb">Pounds</option>
+           		     <option value="g">Grams</option>
+           		     <option value="kg">Kilograms</option>
+           		     <option value="ml">Milliliters</option>
+           		     <option value="l">Liters</option>
+           		     <option value="pint">Pint</option>
+           		     <option value="quart">Quart</option>
+           		     <option value="gallon">Gallon</option>
+           		 </select>
             		<label>Ingredient:</label>
             		<input type="text" name="ingredients-${ingredientCount}-ingredient_name" size="20" autocomplete="off">
         `;
         container.appendChild(div);
         ingredientCount++;
     }
+    function showGroupSelect() {
+        const privateOption = document.querySelector('input[name="privacy"][value="private"]');
+        const groupContainer = document.getElementById('group-select-container');
+        if (privateOption && privateOption.checked) {
+            groupContainer.style.display = 'block';
+        } else {
+            groupContainer.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const privacyOptions = document.querySelectorAll('input[name="privacy"]');
+        privacyOptions.forEach(option => option.addEventListener('change', showGroupSelect));
+        showGroupSelect();
+    });
 </script>
 {% endblock %}

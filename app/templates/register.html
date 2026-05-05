@@ -4,6 +4,10 @@
 
 <h2> Register </h2>
 
+{% if error %}
+<p style="color: red;">{{ error }}</p>
+{% endif %}
+
 <form method="POST">
     <p>Email: </p>
     <input type="text" name="email" required></p>
@@ -16,6 +20,8 @@
 
     <button type="submit">Register</button>
 </form>
+
+<p>Coming back? <a href="{{ url_for('login') }}">Log in</a></p>
 
 {% if request.args.get('email') %}
 <p style="margin-top:20px; color:green;">

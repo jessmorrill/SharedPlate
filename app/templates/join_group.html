@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Join Group</h2>
+<form method="GET" action="{{ url_for('join_group') }}" style="margin-bottom: 1rem;">
+    {{ form.searchB.label }}<br>
+    {{ form.searchB(size=32) }}
+    {{ form.submitB(class_='button') }}
+</form>
+{% if groups is not none %}
+  {% if groups %}
+    <ul>
+      {% for group in groups %}
+        <li style="margin-bottom: 1rem;">
+          <strong><a href="{{ url_for('group_detail', group_id=group.id, group_name=group.group_name) }}">{{ group.group_name }}</a></strong>
+          <span style="margin-left: 0.5rem; color: #555;">({{ group.privacy_setting|capitalize }})</span>
+          <div style="margin-top: 0.25rem;">
+            {% if group.privacy_setting == 'public' %}
+              <form method="POST" action="{{ url_for('request_join', group_id=group.id) }}" style="display:inline;">
+                <button type="submit">Join Group</button>
+              </form>
+            {% else %}
+              <span>This is a private group.</span>
+              <a href="{{ url_for('group_detail', group_id=group.id, group_name=group.group_name) }}">Request to join</a>
+            {% endif %}
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No groups matched your search.</p>
+  {% endif %}
+{% endif %}
+{% endblock %}
