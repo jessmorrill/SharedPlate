@@ -2,7 +2,7 @@ from app import app, db, mail
 from flask import session, render_template, redirect, url_for, request, flash
 from flask_mail import Message
 from app.forms import CreateRecipe, SearchRecipe, CreateGroup, SearchGroup
-from app.models import Recipe, Ingredient, Group, User, Group_Membership, JoinRequest, Invite
+from app.models import Recipe, Ingredient, Group, User, Group_Membership, JoinRequest, Invite, LikedRecipe
 from datetime import datetime
 import random
 import pdb
@@ -77,9 +77,31 @@ def home():
 
 @app.route('/recipe/<int:recipe_id>', methods=['GET'])
 def recipe_detail(recipe_id):
+    user = get_current_user()
     recipe = Recipe.query.get_or_404(recipe_id)
     ingredients = Ingredient.query.filter_by(recipe_id=recipe_id).all()
-    return render_template('recipe_detail.html', recipe=recipe, ingredients=ingredients)
+    liked = False
+    if user:
+        liked = LikedRecipe.query.filter_by(user_email=user.email, recipe_id=recipe_id).first() is not None
+    return render_template('recipe_detail.html', recipe=recipe, ingredients=ingredients, liked=liked)
+
+
+@app.route('/recipe/<int:recipe_id>/toggle_like', methods=['POST'])
+def toggle_like(recipe_id):
+    user = get_current_user()
+    if not user:
+        return redirect(url_for('login'))
+    recipe = Recipe.query.get_or_404(recipe_id)
+    existing_like = LikedRecipe.query.filter_by(user_email=user.email, recipe_id=recipe_id).first()
+    if existing_like:
+        db.session.delete(existing_like)
+        flash(f'Recipe "{recipe.title}" removed from liked recipes.', 'success')
+    else:
+        like = LikedRecipe(user_email=user.email, recipe_id=recipe_id)
+        db.session.add(like)
+        flash(f'Recipe "{recipe.title}" added to liked recipes.', 'success')
+    db.session.commit()
+    return redirect(url_for('recipe_detail', recipe_id=recipe_id))
 
 
 @app.route('/create-recipe', methods=['GET', 'POST'])
@@ -316,7 +338,9 @@ def dashboard():
     creator_group_ids = [m.group_id for m in creator_memberships]
     pending_requests = JoinRequest.query.filter(JoinRequest.group_id.in_(creator_group_ids), JoinRequest.status == 'pending').all()
     pending_invites = Invite.query.filter_by(invitee_email=user.email, status='pending').all()
-    return render_template('dashboard.html', user=user, recipes=recipes, groups=groups, pending_requests=pending_requests, pending_invites=pending_invites)
+    liked_items = LikedRecipe.query.filter_by(user_email=user.email).all()
+    liked_recipes = [item.recipe for item in liked_items]
+    return render_template('dashboard.html', user=user, recipes=recipes, groups=groups, pending_requests=pending_requests, pending_invites=pending_invites, liked_recipes=liked_recipes)
 
 
 @app.route('/group/<int:group_id>-<string:group_name>')
@@ -470,6 +494,69 @@ def invite_user(group_id, invitee_email):
 
     flash(f'Invite sent to {invitee.username}!', 'success') 
     return redirect(url_for('add_members', group_id=group_id, search_query=request.form.get('search_query', '')))  # FIX: preserve search
+
+
+@app.route('/group/<int:group_id>/leave', methods=['POST'])
+def leave_group(group_id):
+    user = get_current_user()
+    if not user:
+        return redirect(url_for('login'))
+    membership = Group_Membership.query.filter_by(user_email=user.email, group_id=group_id).first()
+    if not membership:
+        flash('You are not a member of that group.', 'warning')
+        return redirect(url_for('home'))
+    if membership.role == 'creator':
+        flash('Group creators must delete the group instead of leaving it.', 'warning')
+        group = Group.query.get_or_404(group_id)
+        return redirect(url_for('group_detail', group_id=group.id, group_name=group.group_name))
+    group_name = membership.group.group_name if membership.group else 'the group'
+    db.session.delete(membership)
+    db.session.commit()
+    flash(f'You have left "{group_name}".', 'success')
+    return redirect(url_for('home'))
+
+
+@app.route('/group/<int:group_id>/delete', methods=['POST'])
+def delete_group(group_id):
+    user = get_current_user()
+    if not user:
+        return redirect(url_for('login'))
+    group = Group.query.get_or_404(group_id)
+    membership = Group_Membership.query.filter_by(user_email=user.email, group_id=group.id).first()
+    if not membership or membership.role != 'creator':
+        return redirect(url_for('home'))
+
+    Invite.query.filter_by(group_id=group.id).delete()
+    JoinRequest.query.filter_by(group_id=group.id).delete()
+    for recipe in Recipe.query.filter_by(group_id=group.id).all():
+        Ingredient.query.filter_by(recipe_id=recipe.id).delete()
+        db.session.delete(recipe)
+    Group_Membership.query.filter_by(group_id=group.id).delete()
+    db.session.delete(group)
+    db.session.commit()
+
+    flash(f'Group "{group.group_name}" has been deleted.', 'success')
+    return redirect(url_for('home'))
+
+
+@app.route('/recipe/<int:recipe_id>/delete', methods=['POST'])
+def delete_recipe(recipe_id):
+    user = get_current_user()
+    if not user:
+        return redirect(url_for('login'))
+    recipe = Recipe.query.get_or_404(recipe_id)
+    if recipe.user_email != user.email:
+        return redirect(url_for('home'))
+    group_name = recipe.group.group_name if recipe.group else ''
+    group_id = recipe.group_id
+    Ingredient.query.filter_by(recipe_id=recipe.id).delete()
+    db.session.delete(recipe)
+    db.session.commit()
+
+    flash(f'Recipe "{recipe.title}" deleted.', 'success')
+    if group_name:
+        return redirect(url_for('group_detail', group_id=group_id, group_name=group_name))
+    return redirect(url_for('home'))
 
 
 @app.route('/invite/<int:invite_id>', methods=['GET'])

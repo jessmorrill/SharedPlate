@@ -72,3 +72,10 @@ class Ingredient(db.Model):
     name = db.Column(db.String(64), primary_key=True)
     num = db.Column(db.Integer, nullable=False)
     units = db.Column(db.String(64), nullable=False)
+
+class LikedRecipe(db.Model):
+    __tablename__ = 'liked_recipe'
+    user_email = db.Column(db.String(64), db.ForeignKey('user.email'), primary_key=True)
+    recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), primary_key=True)
+    user = db.relationship('User', backref='liked_recipes')
+    recipe = db.relationship('Recipe', backref='liked_by')

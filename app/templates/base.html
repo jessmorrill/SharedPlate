@@ -13,7 +13,7 @@
 <a href="{{ url_for('join_group') }}">Join Group</a>
 {% if session.get('user') %}
 <a href="{{ url_for('logout') }}">Logout</a>
-<a href="{{ url_for('dashboard') }}" style="color:white; margin-left:20px;">
+<a href="{{ url_for('dashboard') }}" style="color:white; margin-left:80%;">
     {{ current_user.username if current_user else session['user'] }}
 </a>
 {% endif %}

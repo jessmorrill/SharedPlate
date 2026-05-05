@@ -51,6 +51,17 @@ document.getElementById('toggleNotifications').addEventListener('click', functio
 });
 </script>
 
+<h2>Liked Recipes</h2>
+{% if liked_recipes %}
+  <ul>
+    {% for recipe in liked_recipes %}
+      <li><a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}">{{ recipe.title }}</a> — by {{ recipe.author.username if recipe.author else recipe.user_email }}</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>You haven't liked any recipes yet.</p>
+{% endif %}
+
 <h2>Your Recipes</h2>
 {% if recipes %}
   <ul>

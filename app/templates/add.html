@@ -34,6 +34,9 @@
             {{ ingredient.ingredient_name.label }}
             {{ ingredient.ingredient_name(size=20, class_="ingredient-input") }}
           </div>
+          <div class="ingredient-field ingredient-field--action">
+            <button type="button" class="btn btn-secondary ingredient-remove" onclick="removeIngredient(this)">Delete</button>
+          </div>
         </div>
         {% endfor %}
     </div>
@@ -94,10 +97,34 @@
             <label>Ingredient:</label>
             <input type="text" name="ingredients-${ingredientCount}-ingredient_name" size="20" autocomplete="off" class="ingredient-input">
           </div>
+          <div class="ingredient-field ingredient-field--action">
+            <button type="button" class="btn btn-secondary ingredient-remove" onclick="removeIngredient(this)">Delete</button>
+          </div>
         `;
         container.appendChild(div);
         ingredientCount++;
-    }
+		reindexIngredients();
+	}
+
+	function removeIngredient(button) {
+		const row = button.closest('.ingredient-row');
+		if (!row) return;
+		row.remove();
+		reindexIngredients();
+		ingredientCount = document.querySelectorAll('.ingredient-row').length;
+	}
+
+	function reindexIngredients() {
+		const rows = document.querySelectorAll('#ingredients .ingredient-row');
+		rows.forEach((row, index) => {
+			const quantity = row.querySelector('input[type="number"]');
+			const unit = row.querySelector('select');
+			const name = row.querySelector('input[type="text"]');
+			if (quantity) quantity.name = `ingredients-${index}-num`;
+			if (unit) unit.name = `ingredients-${index}-unit`;
+			if (name) name.name = `ingredients-${index}-ingredient_name`;
+		});
+	}
     function showGroupSelect() {
         const privateOption = document.querySelector('input[name="privacy"][value="private"]');
         const groupContainer = document.getElementById('group-select-container');
