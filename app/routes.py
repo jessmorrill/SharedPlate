@@ -578,3 +578,7 @@ def deny_request(group_id, request_id):
 
     flash('Request denied.', 'info') 
     return redirect(url_for('manage_requests', group_id=group_id)) 
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
