@@ -14,8 +14,8 @@
 <div class="navbar">
 <a href="/">Home</a>
 <a href="/create-group">Create Group</a>
+<a href="{{ url_for('join_group') }}">Join Group</a>
 {% if session.get('user') %}
-  <a href="{{ url_for('join_group') }}">Join Group</a>
   <a href="{{ url_for('logout') }}">Logout</a>
   <a href="{{ url_for('dashboard') }}" style="color:white; margin-left:20px;">
     {{ current_user.username if current_user else session['user'] }}
