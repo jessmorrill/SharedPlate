@@ -57,8 +57,13 @@ def require_login_or_register():
         return redirect(url_for('login'))
 
 
+
 @app.route('/', methods=['GET'])
 def home():
+    greetings = ("What's on your plate for today?", "Hungry for something new?", "Discover your next favorite recipe!", 
+                 "Welcome back!", "What are you going to make today?", "Happy Cooking!", "Cheat on your diet... we won't tell!", 
+                 "Just like grandma used to make!", "How can we inspire your next meal?")
+    greeting = random.choice(greetings)
     form = SearchRecipe(request.args)
     form2 = SearchGroup(request.args)
     recipes_query = Recipe.query.filter_by(privacy_setting='public')
@@ -73,7 +78,7 @@ def home():
         )
     recipes = recipes_query.all()
     groups = groups_query.all()
-    return render_template('index.html', recipes=recipes, groups=groups, form=form, form2=form2)
+    return render_template('index.html', recipes=recipes, groups=groups, form=form, form2=form2, greeting=greeting)
 
 
 @app.route('/recipe/<int:recipe_id>', methods=['GET'])
