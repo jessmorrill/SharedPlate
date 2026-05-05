@@ -23,6 +23,23 @@ def inject_current_user():
     return {'current_user': None}
 
 
+@app.before_request
+def require_login_or_register():
+    allowed_paths = {'/login', '/register', '/forgot-password', '/reset-password', '/verify'}
+    if request.endpoint == 'static':
+        return
+    if session.get('user'):
+        return
+    user_email = request.args.get('user')
+    if user_email:
+        existing = User.query.filter_by(email=user_email).first()
+        if existing:
+            session['user'] = existing.email
+            return
+    if request.path not in allowed_paths:
+        return redirect(url_for('register'))
+
+
 @app.route('/', methods=['GET'])
 def home():
     form = SearchRecipe(request.args)
@@ -279,7 +296,7 @@ def request_join(group_id):
         creator = User.query.filter_by(email=creator_membership.user_email).first()
         if creator:
             msg = Message('Join Request for Your Group', recipients=[creator.email])
-            msg.body = f'{user.username} has requested to join your group "{group.group_name}".\n\nTo manage this request, visit: {url_for("manage_requests", group_id=group.id, _external=True)}'
+            msg.body = f'{user.username} has requested to join your group "{group.group_name}".\n\nTo manage this request, visit: {url_for("manage_requests", group_id=group.id, user=creator.email, _external=True)}'
             mail.send(msg)
 
     return redirect(url_for('group_detail', group_id=group.id, group_name=group.group_name))
@@ -357,7 +374,7 @@ def invite_user(group_id, invitee_email):
     db.session.commit()
     
     msg = Message('Group Invitation', recipients=[invitee_email])
-    msg.body = f'You have been invited to join the group "{group.group_name}" by {user.username}.\n\nTo accept or decline, visit: {url_for("manage_invite", invite_id=invite.id, _external=True)}'
+    msg.body = f'You have been invited to join the group "{group.group_name}" by {user.username}.\n\nTo accept or decline, visit: {url_for("manage_invite", invite_id=invite.id, user=invitee_email, _external=True)}'
     mail.send(msg)
     
     return redirect(url_for('add_members', group_id=group_id))
