@@ -7,10 +7,21 @@
 
 {% if membership %}
   {% if membership.role == 'creator' %}
-    <a href="{{ url_for('manage_requests', group_id=group.id) }}">Manage Join Requests</a>
-    <a href="{{ url_for('add_members', group_id=group.id) }}">Add Members</a>
+    <a href="{{ url_for('manage_requests', group_id=group.id) }}" class="btn">Manage Join Requests</a>
+    <a href="{{ url_for('add_members', group_id=group.id) }}" class="btn">Add Members</a>
   {% endif %}
-  <a href="{{ url_for('add_recipe', group_id=group.id) }}">+ Post a Recipe</a>
+  <a href="{{ url_for('add_recipe', group_id=group.id) }}" class="btn">+ Post a Recipe</a>
+  <div class="group-action-row">
+    {% if membership.role == 'creator' %}
+      <form method="POST" action="{{ url_for('delete_group', group_id=group.id) }}" onsubmit="return confirm('Delete this group and all its recipes?');">
+        <button type="submit" class="btn btn-secondary">Delete Group</button>
+      </form>
+    {% else %}
+      <form method="POST" action="{{ url_for('leave_group', group_id=group.id) }}">
+        <button type="submit" class="btn btn-secondary">Leave Group</button>
+      </form>
+    {% endif %}
+  </div>
 {% elif group.privacy_setting == 'public' %}
   <form method="POST" action="{{ url_for('request_join', group_id=group.id) }}">
     <button type="submit">Join Group</button>

@@ -4,7 +4,7 @@
 
 {% block content %}
 
-  <h1>Welcome to SharedPlate!</h1>
+  <span class="greeting"><h2>{{ greeting }}</h2></span>
 
   <hr>
 <div style="margin-bottom:40px;">
@@ -17,7 +17,7 @@
 
         {% if recipes %}
 
-            <ul class="recipes">
+            <ul class="recipes" style="list-style:none;padding:0;">
                 {% for recipe in recipes %}
                     <li>
                         <a href="{{ url_for('recipe_detail', recipe_id=recipe.id) }}">
@@ -44,7 +44,7 @@
     {% if groups %}
         <ul style="list-style:none;padding:0;">
             {% for group in groups %}
-                <li style="margin:10px 0; padding:10px; border:1px solid #ddd; border-radius:8px;">
+                <li>
                     <a href="{{ url_for('group_detail', group_id=group.id, group_name=group.group_name) }}">
                         {{ group.group_name }}
                     </a>

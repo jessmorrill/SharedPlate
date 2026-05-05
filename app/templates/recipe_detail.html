@@ -2,7 +2,17 @@
 
 {% block content %}
 <h1>{{ recipe.title }}</h1>
-<p><strong>Category:</strong> {{ recipe.category }}</p>
+{% if current_user and current_user.email != recipe.user_email %}
+  <form method="POST" action="{{ url_for('toggle_like', recipe_id=recipe.id) }}" style="display:inline-block; margin-bottom:1rem; margin-right:1rem;">
+    <button type="submit" class="btn btn-secondary">{% if liked %}Unlike{% else %}Like{% endif %}</button>
+  </form>
+{% endif %}
+<p> {{ num_likes }} {{ like_text }} </p>
+{% if current_user and current_user.email == recipe.user_email %}
+  <form method="POST" action="{{ url_for('delete_recipe', recipe_id=recipe.id) }}" onsubmit="return confirm('Delete this recipe?');" style="display:inline-block; margin-bottom:1rem;">
+    <button type="submit" class="btn btn-secondary">Delete Recipe</button>
+  </form>
+{% endif %}
 <p><strong>Prep time:</strong> {{ recipe.prep_time }} min &nbsp;|&nbsp; <strong>Cook time:</strong> {{ recipe.cook_time }} min</p>
 <p><strong>Serves:</strong> {{ recipe.num_serves }}</p>
 <p><strong>Posted:</strong> {{ recipe.date_posted }}</p>

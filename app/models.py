@@ -10,7 +10,6 @@ class Recipe(db.Model):
     prep_time = db.Column(db.Integer, nullable = False)
     cook_time = db.Column(db.Integer, nullable=False)
     body = db.Column(db.TEXT, nullable=False)
-    category = db.Column(db.String(64), nullable=False)
     num_serves = db.Column(db.Integer, nullable = False)
     privacy_setting = db.Column(db.String(64), nullable=False)
     is_validated = db.Column(db.Boolean, nullable=True)
@@ -42,8 +41,7 @@ class Group_Membership(db.Model):
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'), primary_key=True)
     role = db.Column(db.String(64), nullable=False)
     notify_if_review = db.Column(db.Boolean, nullable=False)
-    notify_if_fork = db.Column(db.Boolean, nullable=False)
-    notify_if_change = db.Column(db.Boolean, nullable=False)
+    notify_if_like = db.Column(db.Boolean, nullable=False)
 
 class JoinRequest(db.Model):
     __tablename__ = 'join_request'
@@ -73,3 +71,10 @@ class Ingredient(db.Model):
     name = db.Column(db.String(64), primary_key=True)
     num = db.Column(db.Integer, nullable=False)
     units = db.Column(db.String(64), nullable=False)
+
+class LikedRecipe(db.Model):
+    __tablename__ = 'liked_recipe'
+    user_email = db.Column(db.String(64), db.ForeignKey('user.email'), primary_key=True)
+    recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), primary_key=True)
+    user = db.relationship('User', backref='liked_recipes')
+    recipe = db.relationship('Recipe', backref='liked_by')

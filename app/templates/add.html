@@ -19,17 +19,28 @@
         {{ form.cook_time(size=32) }}
     </p>
     <h3>Ingredients</h3>
-    <div id="ingredients">
+    <div id="ingredients" class="ingredients-list">
         {% for ingredient in form.ingredients %}
-        <div class="ingredient_row">
-  		{{ ingredient.num.label }} {{ingredient.num(size=5) }}
-		{{ ingredient.unit.label }} {{ ingredient.unit() }}
-        {{ ingredient.ingredient_name.label }} {{ingredient.ingredient_name(size=20) }}
-
-	</div>
-	{% endfor %}
+        <div class="ingredient-row">
+          <div class="ingredient-field ingredient-field--small">
+            {{ ingredient.num.label }}
+            {{ ingredient.num(size=3, class_="quantity-input") }}
+          </div>
+          <div class="ingredient-field ingredient-field--small">
+            {{ ingredient.unit.label }}
+            {{ ingredient.unit(class_="unit-select") }}
+          </div>
+          <div class="ingredient-field">
+            {{ ingredient.ingredient_name.label }}
+            {{ ingredient.ingredient_name(size=20, class_="ingredient-input") }}
+          </div>
+          <div class="ingredient-field ingredient-field--action">
+            <button type="button" class="btn btn-secondary ingredient-remove" onclick="removeIngredient(this)">Delete</button>
+          </div>
+        </div>
+        {% endfor %}
     </div>
-    <button type="button" onclick="addIngredient()">Add Ingredient</button>
+    <button type="button" class="btn" onclick="addIngredient()">Add Ingredient</button>
     <br>
     <p>
         {{ form.body.label }}<br>
@@ -51,44 +62,69 @@
         {{ form.privacy() }}
     </p>
 
-    <p>
-        {{ form.category.label }}<br>
-        {{ form.category() }}
-    </p>
-
     <p>{{ form.submit() }}</p>
 </form>
 <script>
 	let ingredientCount = {{form.ingredients | length }}
 	function addIngredient() {
 		const container = document.getElementById('ingredients');
-		const div= document.createElement('div');
-		div.classList.add('ingredient_row');
-		div.innerHTML = ` 
-			<label>Quantity:</label>
-            		<input type="number" name="ingredients-${ingredientCount}-num" size="5" autocomplete="off">
-           		 <label>Unit:</label>
-           		 <select name="ingredients-${ingredientCount}-unit">
-           		     <option value="">None</option>
-           		     <option value="oz">Ounces</option>
-           		     <option value="cups">Cups</option>
-           		     <option value="tbsp">Tablespoons</option>
-           		     <option value="tsp">Teaspoons</option>
-           		     <option value="lb">Pounds</option>
-           		     <option value="g">Grams</option>
-           		     <option value="kg">Kilograms</option>
-           		     <option value="ml">Milliliters</option>
-           		     <option value="l">Liters</option>
-           		     <option value="pint">Pint</option>
-           		     <option value="quart">Quart</option>
-           		     <option value="gallon">Gallon</option>
-           		 </select>
-            		<label>Ingredient:</label>
-            		<input type="text" name="ingredients-${ingredientCount}-ingredient_name" size="20" autocomplete="off">
+		const div = document.createElement('div');
+		div.classList.add('ingredient-row');
+		div.innerHTML = `
+          <div class="ingredient-field ingredient-field--small">
+            <label>Quantity:</label>
+            <input type="number" name="ingredients-${ingredientCount}-num" size="3" autocomplete="off" class="quantity-input">
+          </div>
+          <div class="ingredient-field ingredient-field--small">
+            <label>Unit:</label>
+            <select name="ingredients-${ingredientCount}-unit" class="unit-select">
+              <option value="">None</option>
+              <option value="oz">Ounces</option>
+              <option value="cups">Cups</option>
+              <option value="tbsp">Tablespoons</option>
+              <option value="tsp">Teaspoons</option>
+              <option value="lb">Pounds</option>
+              <option value="g">Grams</option>
+              <option value="kg">Kilograms</option>
+              <option value="ml">Milliliters</option>
+              <option value="l">Liters</option>
+              <option value="pint">Pint</option>
+              <option value="quart">Quart</option>
+              <option value="gallon">Gallon</option>
+            </select>
+          </div>
+          <div class="ingredient-field">
+            <label>Ingredient:</label>
+            <input type="text" name="ingredients-${ingredientCount}-ingredient_name" size="20" autocomplete="off" class="ingredient-input">
+          </div>
+          <div class="ingredient-field ingredient-field--action">
+            <button type="button" class="btn btn-secondary ingredient-remove" onclick="removeIngredient(this)">Delete</button>
+          </div>
         `;
         container.appendChild(div);
         ingredientCount++;
-    }
+		reindexIngredients();
+	}
+
+	function removeIngredient(button) {
+		const row = button.closest('.ingredient-row');
+		if (!row) return;
+		row.remove();
+		reindexIngredients();
+		ingredientCount = document.querySelectorAll('.ingredient-row').length;
+	}
+
+	function reindexIngredients() {
+		const rows = document.querySelectorAll('#ingredients .ingredient-row');
+		rows.forEach((row, index) => {
+			const quantity = row.querySelector('input[type="number"]');
+			const unit = row.querySelector('select');
+			const name = row.querySelector('input[type="text"]');
+			if (quantity) quantity.name = `ingredients-${index}-num`;
+			if (unit) unit.name = `ingredients-${index}-unit`;
+			if (name) name.name = `ingredients-${index}-ingredient_name`;
+		});
+	}
     function showGroupSelect() {
         const privateOption = document.querySelector('input[name="privacy"][value="private"]');
         const groupContainer = document.getElementById('group-select-container');
