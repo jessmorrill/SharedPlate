@@ -408,13 +408,13 @@ ol li::marker { color: var(--orange-primary); font-weight: 600; }
 
 .error {
   background: var(--red-bg);
-  border: 1px solid rgba(192, 57, 43, 0.2);
+  border: 1px solid rgb(255, 0, 0);
   color: var(--red);
 }
 
 .success {
   background: var(--green-bg);
-  border: 1px solid rgba(30, 126, 90, 0.2);
+  border: 1px solid rgb(30, 140, 0);
   color: var(--green);
 }
 
