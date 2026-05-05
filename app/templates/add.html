@@ -46,6 +46,14 @@
         {{ form.privacy() }}
     </p>
 
+    <p id="group-select-container" style="display:none;">
+        {{ form.group_id.label }}<br>
+        {{ form.group_id() }}
+        {% for error in form.group_id.errors %}
+            <span style="color:red; display:block;">{{ error }}</span>
+        {% endfor %}
+    </p>
+
     <p>
         {{ form.category.label }}<br>
         {{ form.category() }}
@@ -84,5 +92,20 @@
         container.appendChild(div);
         ingredientCount++;
     }
+    function showGroupSelect() {
+        const privateOption = document.querySelector('input[name="privacy"][value="private"]');
+        const groupContainer = document.getElementById('group-select-container');
+        if (privateOption && privateOption.checked) {
+            groupContainer.style.display = 'block';
+        } else {
+            groupContainer.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const privacyOptions = document.querySelectorAll('input[name="privacy"]');
+        privacyOptions.forEach(option => option.addEventListener('change', showGroupSelect));
+        showGroupSelect();
+    });
 </script>
 {% endblock %}

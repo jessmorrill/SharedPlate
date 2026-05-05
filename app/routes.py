@@ -84,7 +84,19 @@ def recipe_detail(recipe_id):
 
 @app.route('/create-recipe', methods=['GET', 'POST'])
 def add_recipe():
+    user = get_current_user()
     form = CreateRecipe()
+    user_groups = []
+    if user:
+        user_groups = Group.query.join(Group_Membership).filter(Group_Membership.user_email == user.email).all()
+    form.group_id.choices = [('', 'Select a group')] + [(str(g.id), g.group_name) for g in user_groups]
+
+    group_id = request.args.get('group_id')
+    if request.method == 'GET' and group_id:
+        form.privacy.data = 'private'
+        if str(group_id) in [choice[0] for choice in form.group_id.choices]:
+            form.group_id.data = str(group_id)
+
     if form.validate_on_submit():
         title = form.title.data
         prep_time = form.prep_time.data
@@ -93,10 +105,14 @@ def add_recipe():
         num_serves = form.num_serves.data
         privacy = form.privacy.data
         category = form.category.data
+        selected_group_id = int(form.group_id.data) if form.group_id.data else 1
+        if privacy == 'private' and not form.group_id.data:
+            form.group_id.errors.append('Please select a group for group-only recipes.')
+            return render_template('add.html', form=form)
 
         c = Recipe(
             user_email=session.get('user'),
-            group_id=1,
+            group_id=selected_group_id,
             title=title,
             prep_time=prep_time,
             cook_time=cook_time,
