@@ -450,7 +450,7 @@ def request_join(group_id):
             group_id=group.id,
             role='member',
             notify_if_review=True,
-            notify_if_change=True
+            notify_if_like=True
         )
         db.session.add(membership)
         db.session.commit()
