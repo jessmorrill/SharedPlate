@@ -97,6 +97,7 @@ def recipe_detail(recipe_id):
     ingredients = Ingredient.query.filter_by(recipe_id=recipe_id).all()
     liked = False
     user_review = None
+    author = User.query.filter_by(email=recipe.user_email).first()
     if user:
         liked = LikedRecipe.query.filter_by(user_email=user.email, recipe_id=recipe_id).first() is not None
         user_review = Review.query.filter_by(user_email=user.email, recipe_id=recipe_id).first()
@@ -114,7 +115,8 @@ def recipe_detail(recipe_id):
         num_likes=num_likes,
         like_text=like_text,
         user_review=user_review,
-        other_reviews=other_reviews
+        other_reviews=other_reviews,
+        author=author
     )
 
 
