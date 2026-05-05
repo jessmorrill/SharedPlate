@@ -6,6 +6,7 @@ from app.models import Recipe, Ingredient, Group, User, Group_Membership, JoinRe
 from datetime import datetime
 import random
 import pdb
+from flask import session, render_template, redirect, url_for, request, flash
 
 def get_current_user():
     email = session.get('user')
@@ -137,6 +138,8 @@ def add_recipe():
         db.session.commit()
         return redirect(url_for('group_detail', group_id=group.id, group_name=group.group_name))
 
+    if request.method == 'POST':
+        flash('Failed to create recipe. Please check the form for errors.', 'danger')
     return render_template('add.html', form=form, group=group)
 
 
@@ -160,8 +163,8 @@ def add_group():
         )
         db.session.add(membership)
         db.session.commit()
-        return redirect(url_for('add_group'))
-    return render_template('create_group.html', form=form)
+        flash(f'Group "{group_name}" created!', 'success')
+        return redirect(url_for('group_detail', group_id=c.id, group_name=c.group_name))
 
 
 @app.route('/join-group', methods=['GET', 'POST'])
@@ -347,6 +350,7 @@ def request_join(group_id):
         )
         db.session.add(membership)
         db.session.commit()
+        flash(f'Your request to join "{group.group_name}" has been sent.', 'info')
         return redirect(url_for('group_detail', group_id=group.id, group_name=group.group_name))
 
     existing_request = JoinRequest.query.filter_by(user_email=user.email, group_id=group.id, status='pending').first()
