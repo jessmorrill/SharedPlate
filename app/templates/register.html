@@ -4,6 +4,10 @@
 
 <h2> Register </h2>
 
+{% if error %}
+<p style="color: red;">{{ error }}</p>
+{% endif %}
+
 <form method="POST">
     <p>Email: </p>
     <input type="text" name="email" required></p>

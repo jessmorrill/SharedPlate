@@ -121,8 +121,13 @@ def register():
         username = request.form.get('username')
         password = request.form.get('password')
 
-        existing = User.query.filter_by(email=email).first()
-        if not existing:
+        existing_email = User.query.filter_by(email=email).first()
+        existing_username = User.query.filter_by(username=username).first()
+        if existing_email:
+            return render_template('register.html', error='Email already registered')
+        if existing_username:
+            return render_template('register.html', error='Username already taken')
+        if not existing_email and not existing_username:
             code = str(random.randint(100000, 999999))
 
             new_user = User(
@@ -144,7 +149,7 @@ def register():
 
             return redirect(url_for('verify'))
 
-    return render_template('register.html')
+    return render_template('register.html', error=None)
 
 
 @app.route('/verify', methods=['GET', 'POST'])
@@ -200,9 +205,12 @@ def reset_password():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form.get('email')
+        login_input = request.form.get('email')
         password = request.form.get('password')
-        user = User.query.filter_by(email=email, password=password).first()
+        if '@' in login_input:
+            user = User.query.filter_by(email=login_input, password=password).first()
+        else:
+            user = User.query.filter_by(username=login_input, password=password).first()
         if user and not user.isPending:
             session['user'] = user.email
             return redirect(url_for('home'))
