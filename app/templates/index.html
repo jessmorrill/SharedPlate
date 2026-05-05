@@ -12,6 +12,12 @@
         <form method="get" action="{{ url_for('home') }}" autocomplete="off">
             {{ form.hidden_tag() }}
             {{ form.searchA(placeholder='Search') }}
+            <select name="sort_by" class="form-control" style="margin:8px 0;">
+                <option value="date_desc" {% if sort_by == 'date_desc' %}selected{% endif %}>Newest first</option>
+                <option value="date_oldest" {% if sort_by == 'date_oldest' %}selected{% endif %}>Oldest first</option>
+                <option value="likes" {% if sort_by == 'likes' %}selected{% endif %}>Most likes</option>
+                <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Highest rating</option>
+            </select>
             {{ form.submitA }}
         </form>
 

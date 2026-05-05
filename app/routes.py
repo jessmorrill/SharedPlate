@@ -3,7 +3,7 @@ from sqlalchemy import func
 from flask import session, render_template, redirect, url_for, request, flash
 from flask_mail import Message
 from app.forms import CreateRecipe, SearchRecipe, CreateGroup, SearchGroup
-from app.models import Recipe, Ingredient, Group, User, Group_Membership, JoinRequest, Invite, LikedRecipe
+from app.models import Recipe, Ingredient, Group, User, Group_Membership, JoinRequest, Invite, LikedRecipe, Review
 from datetime import datetime
 import random
 import pdb
@@ -66,19 +66,28 @@ def home():
     greeting = random.choice(greetings)
     form = SearchRecipe(request.args)
     form2 = SearchGroup(request.args)
+    sort_by = request.args.get('sort_by', 'date_desc')
     recipes_query = Recipe.query.filter_by(privacy_setting='public')
     groups_query = Group.query.filter_by(privacy_setting='public')
     if form.searchA.data and form.searchA.data.strip():
         recipes_query = recipes_query.filter(
             Recipe.title.ilike(f"%{form.searchA.data}%")
         )
+    if sort_by == 'likes':
+        recipes_query = recipes_query.outerjoin(LikedRecipe).group_by(Recipe.id).order_by(func.count(LikedRecipe.recipe_id).desc())
+    elif sort_by == 'rating':
+        recipes_query = recipes_query.outerjoin(Review).group_by(Recipe.id).order_by(func.coalesce(func.avg(Review.rating), 0).desc())
+    elif sort_by == 'date_oldest':
+        recipes_query = recipes_query.order_by(Recipe.date_posted.asc())
+    else:
+        recipes_query = recipes_query.order_by(Recipe.date_posted.desc())
     if form2.searchB.data and form2.searchB.data.strip():
         groups_query = groups_query.filter(
             Group.group_name.ilike(f"%{form2.searchB.data}%")
         )
     recipes = recipes_query.all()
     groups = groups_query.all()
-    return render_template('index.html', recipes=recipes, groups=groups, form=form, form2=form2, greeting=greeting)
+    return render_template('index.html', recipes=recipes, groups=groups, form=form, form2=form2, greeting=greeting, sort_by=sort_by)
 
 
 @app.route('/recipe/<int:recipe_id>', methods=['GET'])
@@ -87,11 +96,26 @@ def recipe_detail(recipe_id):
     recipe = Recipe.query.get_or_404(recipe_id)
     ingredients = Ingredient.query.filter_by(recipe_id=recipe_id).all()
     liked = False
+    user_review = None
     if user:
         liked = LikedRecipe.query.filter_by(user_email=user.email, recipe_id=recipe_id).first() is not None
+        user_review = Review.query.filter_by(user_email=user.email, recipe_id=recipe_id).first()
     num_likes = db.session.query(func.count(LikedRecipe.recipe_id)).filter(LikedRecipe.recipe_id == recipe_id).scalar()
+    if user_review:
+        other_reviews = Review.query.filter(Review.recipe_id == recipe_id, Review.user_email != user.email).order_by(Review.date_posted.desc()).all()
+    else:
+        other_reviews = Review.query.filter_by(recipe_id=recipe_id).order_by(Review.date_posted.desc()).all()
     like_text = "like" if num_likes == 1 else "likes"
-    return render_template('recipe_detail.html', recipe=recipe, ingredients=ingredients, liked=liked, num_likes = num_likes, like_text=like_text)
+    return render_template(
+        'recipe_detail.html',
+        recipe=recipe,
+        ingredients=ingredients,
+        liked=liked,
+        num_likes=num_likes,
+        like_text=like_text,
+        user_review=user_review,
+        other_reviews=other_reviews
+    )
 
 
 @app.route('/recipe/<int:recipe_id>/toggle_like', methods=['POST'])
@@ -109,6 +133,43 @@ def toggle_like(recipe_id):
         db.session.add(like)
         flash(f'Recipe "{recipe.title}" added to liked recipes.', 'success')
     db.session.commit()
+    return redirect(url_for('recipe_detail', recipe_id=recipe_id))
+
+
+@app.route('/recipe/<int:recipe_id>/review', methods=['POST'])
+def submit_review(recipe_id):
+    user = get_current_user()
+    if not user:
+        return redirect(url_for('login'))
+    recipe = Recipe.query.get_or_404(recipe_id)
+    existing_review = Review.query.filter_by(user_email=user.email, recipe_id=recipe_id).first()
+    if existing_review:
+        flash('You have already submitted a review for this recipe.', 'warning')
+        return redirect(url_for('recipe_detail', recipe_id=recipe_id))
+
+    title = request.form.get('title', '').strip()
+    rating = request.form.get('rating')
+    comment = request.form.get('comment', '').strip()
+    try:
+        rating = int(rating)
+    except (TypeError, ValueError):
+        rating = None
+
+    if rating not in [1, 2, 3, 4, 5] or not comment:
+        flash('Please provide a rating and a comment.', 'warning')
+        return redirect(url_for('recipe_detail', recipe_id=recipe_id))
+
+    review = Review(
+        user_email=user.email,
+        recipe_id=recipe_id,
+        title=title,
+        rating=rating,
+        comment=comment,
+        date_posted=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    )
+    db.session.add(review)
+    db.session.commit()
+    flash('Review submitted.', 'success')
     return redirect(url_for('recipe_detail', recipe_id=recipe_id))
 
 
@@ -358,8 +419,18 @@ def group_detail(group_id, group_name):
         creator_username = creator_membership.user.username
     if not membership and group.privacy_setting == 'private':
         return render_template('group_page.html', group=group, membership=None, can_request=True, creator_username=creator_username)
-    recipes = Recipe.query.filter_by(group_id=group.id).all()
-    return render_template('group_page.html', group=group, recipes=recipes, membership=membership, can_request=(not membership and group.privacy_setting == 'public'), creator_username=creator_username)
+    sort_by = request.args.get('sort_by', 'date_desc')
+    recipes_query = Recipe.query.filter_by(group_id=group.id)
+    if sort_by == 'likes':
+        recipes_query = recipes_query.outerjoin(LikedRecipe).group_by(Recipe.id).order_by(func.count(LikedRecipe.recipe_id).desc())
+    elif sort_by == 'rating':
+        recipes_query = recipes_query.outerjoin(Review).group_by(Recipe.id).order_by(func.coalesce(func.avg(Review.rating), 0).desc())
+    elif sort_by == 'date_oldest':
+        recipes_query = recipes_query.order_by(Recipe.date_posted.asc())
+    else:
+        recipes_query = recipes_query.order_by(Recipe.date_posted.desc())
+    recipes = recipes_query.all()
+    return render_template('group_page.html', group=group, recipes=recipes, membership=membership, can_request=(not membership and group.privacy_setting == 'public'), creator_username=creator_username, sort_by=sort_by)
 
 
 @app.route('/group/<int:group_id>/request_join', methods=['POST'])
@@ -379,7 +450,7 @@ def request_join(group_id):
             group_id=group.id,
             role='member',
             notify_if_review=True,
-            notify_if_change=True
+            notify_if_like=True
         )
         db.session.add(membership)
         db.session.commit()
