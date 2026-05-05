@@ -18,9 +18,6 @@
           <span style="margin-left: 0.5rem; color: #555;">({{ group.privacy_setting|capitalize }})</span>
           <div style="margin-top: 0.25rem;">
             {% if group.privacy_setting == 'public' %}
-              {% if group.id in membership_ids %}
-                <span>Already a member</span>
-              {% else %}
                 <form method="POST" action="{{ url_for('request_join', group_id=group.id) }}" style="display:inline;">
                   <button type="submit">Join Group</button>
                 </form>

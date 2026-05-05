@@ -171,13 +171,15 @@ def join_group():
         return redirect(url_for('login'))
     form = SearchGroup(request.args if request.method == 'GET' else request.form)
     query = form.searchB.data.strip() if form.searchB.data else ''
-    group_query = Group.query
+    
+    membership_ids = [m.group_id for m in Group_Membership.query.filter_by(user_email=user.email).all()]
+    
+    group_query = Group.query.filter(~Group.id.in_(membership_ids))
     if query:
         group_query = group_query.filter(Group.group_name.ilike(f"%{query}%"))
     groups = group_query.all()
-    membership_ids = [m.group_id for m in Group_Membership.query.filter_by(user_email=user.email).all()]
+    
     return render_template('join_group.html', form=form, groups=groups, membership_ids=membership_ids)
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
