@@ -177,14 +177,13 @@ def add_group():
             group_id=c.id,
             role='creator',
             notify_if_review=True,
-            notify_if_fork=True,
             notify_if_change=True
         )
         db.session.add(membership)
         db.session.commit()
         flash(f'Group "{group_name}" created!', 'success')
-        return redirect(url_for('group_detail', group_id=c.id, group_name=c.group_name))  # FIX: redirect to group page
-    return render_template('create_group.html', form=form)  # FIX: was missing entirely
+        return redirect(url_for('group_detail', group_id=c.id, group_name=c.group_name))  
+    return render_template('create_group.html', form=form)  
 
 
 @app.route('/join-group', methods=['GET', 'POST'])
@@ -375,7 +374,6 @@ def request_join(group_id):
             group_id=group.id,
             role='member',
             notify_if_review=True,
-            notify_if_fork=True,
             notify_if_change=True
         )
         db.session.add(membership)

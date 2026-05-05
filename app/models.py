@@ -41,8 +41,7 @@ class Group_Membership(db.Model):
     group_id = db.Column(db.Integer, db.ForeignKey('group.id'), primary_key=True)
     role = db.Column(db.String(64), nullable=False)
     notify_if_review = db.Column(db.Boolean, nullable=False)
-    notify_if_fork = db.Column(db.Boolean, nullable=False)
-    notify_if_change = db.Column(db.Boolean, nullable=False)
+    notify_if_like = db.Column(db.Boolean, nullable=False)
 
 class JoinRequest(db.Model):
     __tablename__ = 'join_request'
