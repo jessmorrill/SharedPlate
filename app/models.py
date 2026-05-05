@@ -78,3 +78,15 @@ class LikedRecipe(db.Model):
     recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), primary_key=True)
     user = db.relationship('User', backref='liked_recipes')
     recipe = db.relationship('Recipe', backref='liked_by')
+
+class Review(db.Model):
+    __tablename__ = 'review'
+    id = db.Column(db.Integer, primary_key=True)
+    user_email = db.Column(db.String(64), db.ForeignKey('user.email'), nullable=False)
+    recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), nullable=False)
+    title = db.Column(db.String(128), nullable=True)
+    rating = db.Column(db.Integer, nullable=False)
+    comment = db.Column(db.Text, nullable=False)
+    date_posted = db.Column(db.Text, nullable=False)
+    user = db.relationship('User', foreign_keys=[user_email], backref='reviews')
+    recipe = db.relationship('Recipe', foreign_keys=[recipe_id], backref='reviews')

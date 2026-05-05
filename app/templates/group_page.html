@@ -36,6 +36,16 @@
 
 {% if membership or group.privacy_setting == 'public' %}
 <h2>Recipes</h2>
+<form method="get" action="{{ url_for('group_detail', group_id=group.id, group_name=group.group_name) }}" autocomplete="off" style="margin-bottom:16px;">
+  <label for="sort_by">Sort recipes:</label>
+  <select name="sort_by" id="sort_by" class="form-control" style="margin-top:4px; width:250px;">
+    <option value="date_desc" {% if sort_by == 'date_desc' %}selected{% endif %}>Newest first</option>
+    <option value="date_oldest" {% if sort_by == 'date_oldest' %}selected{% endif %}>Oldest first</option>
+    <option value="likes" {% if sort_by == 'likes' %}selected{% endif %}>Most likes</option>
+    <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>Highest rating</option>
+  </select>
+  <button type="submit" class="btn" style="margin-top:8px;">Sort</button>
+</form>
 {% if recipes %}
   <ul>
     {% for recipe in recipes %}
