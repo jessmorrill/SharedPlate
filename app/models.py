@@ -10,7 +10,6 @@ class Recipe(db.Model):
     prep_time = db.Column(db.Integer, nullable = False)
     cook_time = db.Column(db.Integer, nullable=False)
     body = db.Column(db.TEXT, nullable=False)
-    category = db.Column(db.String(64), nullable=False)
     num_serves = db.Column(db.Integer, nullable = False)
     privacy_setting = db.Column(db.String(64), nullable=False)
     is_validated = db.Column(db.Boolean, nullable=True)
