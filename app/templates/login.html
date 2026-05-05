@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-
+<h1>Shared Plate</h1>
+<p>Sharing recipes with your family is just a click away. Here you can store all of your
+    cherished family recipes in one place. Join a group and get to sharing!</p>
 <h2>Login</h2>
 
 {% if error %}
@@ -19,6 +21,6 @@
 </form>
 
 <p><a href="{{ url_for('forgot_password') }}">Forgot Password?</a></p>
-<p>Don't have an account? <a href="{{ url_for('register') }}">Sign up</a></p>
+<p>Or maybe you don't have an account? Don't worry, you can <a href="{{ url_for('register') }}">Sign up</a> here!</p>
 
 {% endblock %}
