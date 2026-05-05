@@ -216,6 +216,53 @@ select {
   padding-right: 2.25rem;
 }
 
+.ingredient-row {
+  display: flex;
+  gap: 1rem;
+  background: rgba(232, 84, 26, 0.08);
+  border: 1px solid rgba(232, 84, 26, 0.2);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  margin-bottom: var(--s3);
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.ingredient-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ingredient-field--small {
+  flex: 0 0 7.5rem;
+}
+
+.ingredient-row label {
+  font-size: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.ingredient-row input,
+.ingredient-row select {
+  width: 100%;
+  max-width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.quantity-input {
+  max-width: 5rem;
+}
+
+.unit-select {
+  max-width: 7rem;
+}
+
+.ingredient-input {
+  min-width: 12rem;
+}
+
 textarea {
   resize: vertical;
   min-height: 120px;
