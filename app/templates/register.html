@@ -21,6 +21,8 @@
     <button type="submit">Register</button>
 </form>
 
+<p>Coming back? <a href="{{ url_for('login') }}">Log in</a></p>
+
 {% if request.args.get('email') %}
 <p style="margin-top:20px; color:green;">
     Account created! Click below to verify:

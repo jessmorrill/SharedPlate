@@ -37,7 +37,7 @@ def require_login_or_register():
             session['user'] = existing.email
             return
     if request.path not in allowed_paths:
-        return redirect(url_for('register'))
+        return redirect(url_for('login'))
 
 
 @app.route('/', methods=['GET'])

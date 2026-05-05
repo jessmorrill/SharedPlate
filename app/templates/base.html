@@ -20,9 +20,6 @@
   <a href="{{ url_for('dashboard') }}" style="color:white; margin-left:20px;">
     {{ current_user.username if current_user else session['user'] }}
   </a>
-{% else %}
-  <a href="{{ url_for('login') }}">Login</a>
-  <a href="{{ url_for('register') }}">Register</a>
 {% endif %}
 </div>
 <div class="container">
