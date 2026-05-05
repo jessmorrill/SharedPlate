@@ -181,7 +181,9 @@ def forgot_password():
             msg.body = f'Your SharedPlate password reset code is: {code}'
             mail.send(msg)
             return redirect(url_for('reset_password'))
-    return render_template('forgot_password.html')
+        else:
+            return render_template('forgot_password.html', error='Email not found.')
+    return render_template('forgot_password.html', error=None)
 
 
 @app.route('/reset-password', methods=['GET', 'POST'])
