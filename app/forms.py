@@ -15,7 +15,7 @@ class CreateRecipe(FlaskForm):
     body = TextAreaField("Instructions:",validators=[DataRequired()])
     num_serves = IntegerField("Number of Servings:",validators=[DataRequired(), NumberRange(min=1, message="Must be at least 1")])
     ingredients = FieldList(FormField(IngredientForm), min_entries=1)
-    privacy = RadioField("Visibility:", choices = [("public", "Public (visible on home page)"), ("private", "Group-Only"), ("unlisted", "Private (visible to me only)")],validators=[DataRequired()])
+    privacy = RadioField("Visibility:", choices = [("public", "Public (visible on home page)"), ("private", "Group-Only")],validators=[DataRequired()])
     category = RadioField("Category:", choices = [("appetizer", "Appetizer"), ("breakfast", "Breakfast"), ("lunch", "Lunch"), ("dinner", "Dinner"), ("dessert", "Dessert")],validators=[DataRequired()])
     submit = SubmitField('Create Recipe!')
 
