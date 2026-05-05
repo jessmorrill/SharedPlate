@@ -1,12 +1,12 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, SubmitField, RadioField, TextAreaField, FieldList, FormField
+from wtforms import StringField, IntegerField, SubmitField, RadioField, TextAreaField, FieldList, FormField, SelectField
 from wtforms.validators import DataRequired, Optional, NumberRange, InputRequired
 from wtforms import Form
 
 class IngredientForm(Form):
     num= IntegerField("Quantity:", validators=[Optional(), NumberRange(min=1, message="Must be at least 1")])
     ingredient_name = StringField("Ingredient:", validators=[Optional()])
-    unit = StringField("Unit:", validators=[Optional()])
+    unit = SelectField("Unit:", choices=[('', 'None'), ('oz', 'Ounces'), ('cups', 'Cups'), ('tbsp', 'Tablespoons'), ('tsp', 'Teaspoons'), ('lb', 'Pounds'), ('g', 'Grams'), ('kg', 'Kilograms'), ('ml', 'Milliliters'), ('l', 'Liters'), ('pint', 'Pint'), ('quart', 'Quart'), ('gallon', 'Gallon')], validators=[Optional()])
 
 class CreateRecipe(FlaskForm):
     title = StringField("Recipe Title:",validators=[DataRequired()])

@@ -163,6 +163,40 @@ def verify():
     return render_template('verify.html', error=None)
 
 
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    if request.method == 'POST':
+        email = request.form.get('email')
+        user = User.query.filter_by(email=email).first()
+        if user:
+            code = str(random.randint(100000, 999999))
+            session['reset_email'] = email
+            session['reset_code'] = code
+            msg = Message('Password Reset Code', recipients=[email])
+            msg.body = f'Your SharedPlate password reset code is: {code}'
+            mail.send(msg)
+            return redirect(url_for('reset_password'))
+    return render_template('forgot_password.html')
+
+
+@app.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    if request.method == 'POST':
+        entered = request.form.get('code')
+        password = request.form.get('password')
+        if entered == session.get('reset_code'):
+            user = User.query.filter_by(email=session.get('reset_email')).first()
+            if user:
+                user.password = password
+                db.session.commit()
+                session.pop('reset_code', None)
+                session.pop('reset_email', None)
+                return redirect(url_for('login'))
+        else:
+            return render_template('reset_password.html', error='Incorrect code, try again.')
+    return render_template('reset_password.html', error=None)
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
