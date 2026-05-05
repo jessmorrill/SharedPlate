@@ -144,9 +144,9 @@ def submit_review(recipe_id):
     recipe = Recipe.query.get_or_404(recipe_id)
     existing_review = Review.query.filter_by(user_email=user.email, recipe_id=recipe_id).first()
     if existing_review:
-        flash('You have already submitted a review for this recipe.', 'warning')
         return redirect(url_for('recipe_detail', recipe_id=recipe_id))
-
+    if user.email == recipe.user_email:
+        return redirect(url_for('recipe_detail', recipe_id=recipe_id))
     title = request.form.get('title', '').strip()
     rating = request.form.get('rating')
     comment = request.form.get('comment', '').strip()
@@ -154,23 +154,21 @@ def submit_review(recipe_id):
         rating = int(rating)
     except (TypeError, ValueError):
         rating = None
-
     if rating not in [1, 2, 3, 4, 5] or not comment:
         flash('Please provide a rating and a comment.', 'warning')
         return redirect(url_for('recipe_detail', recipe_id=recipe_id))
-
     review = Review(
         user_email=user.email,
         recipe_id=recipe_id,
         title=title,
         rating=rating,
         comment=comment,
-        date_posted=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        date_posted=datetime.now()
     )
     db.session.add(review)
     db.session.commit()
-    flash('Review submitted.', 'success')
     return redirect(url_for('recipe_detail', recipe_id=recipe_id))
+
 
 
 @app.route('/create-recipe', methods=['GET', 'POST'])
@@ -657,8 +655,7 @@ def accept_invite(invite_id):
         group_id=invite.group_id,
         role='member',
         notify_if_review=True,
-        notify_if_fork=True,
-        notify_if_change=True
+        notify_if_like=True
     )
     db.session.add(membership)
     invite.status = 'accepted'
@@ -702,8 +699,7 @@ def accept_request(group_id, request_id):
         group_id=group.id,
         role='member',
         notify_if_review=True,
-        notify_if_fork=True,
-        notify_if_change=True
+        notify_if_like=True
     )
     db.session.add(new_membership)
     request_obj.status = 'accepted'
