@@ -214,7 +214,9 @@ def login():
         if user and not user.isPending:
             session['user'] = user.email
             return redirect(url_for('home'))
-    return render_template('login.html')
+        else:
+            return render_template('login.html', error='Username or password is incorrect')
+    return render_template('login.html', error=None)
 
 
 @app.route('/logout')
