@@ -5,8 +5,16 @@
 <h1>{{ group.group_name }}</h1>
 <p>{{ group.privacy_setting | capitalize }} group</p>
 
-{% if current_user %}
+{% if membership %}
+  {% if membership.role == 'creator' %}
+    <a href="{{ url_for('manage_requests', group_id=group.id) }}">Manage Join Requests</a>
+    <a href="{{ url_for('add_members', group_id=group.id) }}">Add Members</a>
+  {% endif %}
   <a href="{{ url_for('add_recipe') }}">+ Post a Recipe</a>
+{% elif group.privacy_setting == 'public' %}
+  <form method="POST" action="{{ url_for('request_join', group_id=group.id) }}">
+    <button type="submit">Request to Join</button>
+  </form>
 {% endif %}
 
 <h2>Recipes</h2>

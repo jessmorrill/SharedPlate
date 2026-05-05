@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Manage Join Requests for {{ group.group_name }}</h2>
+
+{% if requests %}
+<ul>
+{% for request in requests %}
+<li>
+  <strong>{{ request.user.username }}</strong> ({{ request.user.email }}) requested on {{ request.date_requested }}
+  <form method="POST" style="display:inline;">
+    <button type="submit" formaction="{{ url_for('accept_request', group_id=group.id, request_id=request.id) }}">Accept</button>
+  </form>
+  <form method="POST" style="display:inline;">
+    <button type="submit" formaction="{{ url_for('deny_request', group_id=group.id, request_id=request.id) }}">Deny</button>
+  </form>
+</li>
+{% endfor %}
+</ul>
+{% else %}
+<p>No pending requests.</p>
+{% endif %}
+
+<a href="{{ url_for('group_detail', group_id=group.id, group_name=group.group_name) }}">Back to Group</a>
+
+{% endblock %}

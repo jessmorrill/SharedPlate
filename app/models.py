@@ -45,6 +45,28 @@ class Group_Membership(db.Model):
     notify_if_fork = db.Column(db.Boolean, nullable=False)
     notify_if_change = db.Column(db.Boolean, nullable=False)
 
+class JoinRequest(db.Model):
+    __tablename__ = 'join_request'
+    id = db.Column(db.Integer, primary_key=True)
+    user_email = db.Column(db.String(64), db.ForeignKey('user.email'), nullable=False)
+    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)
+    status = db.Column(db.String(64), nullable=False, default='pending')  # pending, accepted, denied
+    date_requested = db.Column(db.TEXT, nullable=False)
+    user = db.relationship('User', foreign_keys=[user_email], backref='join_requests')
+    group = db.relationship('Group', foreign_keys=[group_id], backref='join_requests')
+
+class Invite(db.Model):
+    __tablename__ = 'invite'
+    id = db.Column(db.Integer, primary_key=True)
+    group_id = db.Column(db.Integer, db.ForeignKey('group.id'), nullable=False)
+    inviter_email = db.Column(db.String(64), db.ForeignKey('user.email'), nullable=False)
+    invitee_email = db.Column(db.String(64), db.ForeignKey('user.email'), nullable=False)
+    status = db.Column(db.String(64), nullable=False, default='pending')  # pending, accepted, declined
+    date_invited = db.Column(db.TEXT, nullable=False)
+    group = db.relationship('Group', foreign_keys=[group_id], backref='invites')
+    inviter = db.relationship('User', foreign_keys=[inviter_email], backref='sent_invites')
+    invitee = db.relationship('User', foreign_keys=[invitee_email], backref='received_invites')
+
 class Ingredient(db.Model):
     __tablename__ = 'ingredient'
     recipe_id = db.Column(db.Integer, db.ForeignKey('recipe.id'), primary_key=True)

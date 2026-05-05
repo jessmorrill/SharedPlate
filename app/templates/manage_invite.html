@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h2>Group Invitation</h2>
+
+<p>You have been invited to join the group "{{ invite.group.group_name }}" by {{ invite.inviter.username }}.</p>
+
+<form method="POST" action="{{ url_for('accept_invite', invite_id=invite.id) }}" style="display:inline;">
+    <button type="submit">Accept</button>
+</form>
+<form method="POST" action="{{ url_for('decline_invite', invite_id=invite.id) }}" style="display:inline;">
+    <button type="submit">Decline</button>
+</form>
+
+{% endblock %}

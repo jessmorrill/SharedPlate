@@ -5,6 +5,52 @@
 <h1>{{ user.username }}</h1>
 <p>{{ user.email }} — joined {{ user.date_joined }}</p>
 
+<button id="toggleNotifications">Notifications</button>
+<div id="notifications" style="display: none;">
+<h2>Notifications</h2>
+{% if pending_requests %}
+<h3>Pending Join Requests</h3>
+<ul>
+{% for request in pending_requests %}
+<li>
+  <strong>{{ request.user.username }}</strong> wants to join <strong>{{ request.group.group_name }}</strong> (requested on {{ request.date_requested }})
+  <form method="POST" style="display:inline;" action="{{ url_for('accept_request', group_id=request.group.id, request_id=request.id) }}">
+    <button type="submit">Accept</button>
+  </form>
+  <form method="POST" style="display:inline;" action="{{ url_for('deny_request', group_id=request.group.id, request_id=request.id) }}">
+    <button type="submit">Deny</button>
+  </form>
+</li>
+{% endfor %}
+</ul>
+{% endif %}
+{% if pending_invites %}
+<h3>Pending Invites</h3>
+<ul>
+{% for invite in pending_invites %}
+<li>
+  You have been invited to join <strong>{{ invite.group.group_name }}</strong> by {{ invite.inviter.username }}
+  <a href="{{ url_for('manage_invite', invite_id=invite.id) }}">Manage Invite</a>
+</li>
+{% endfor %}
+</ul>
+{% endif %}
+{% if not pending_requests and not pending_invites %}
+<p>No pending notifications.</p>
+{% endif %}
+</div>
+
+<script>
+document.getElementById('toggleNotifications').addEventListener('click', function() {
+    var notifications = document.getElementById('notifications');
+    if (notifications.style.display === 'none') {
+        notifications.style.display = 'block';
+    } else {
+        notifications.style.display = 'none';
+    }
+});
+</script>
+
 <h2>Your Recipes</h2>
 {% if recipes %}
   <ul>
