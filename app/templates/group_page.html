@@ -13,10 +13,17 @@
   <a href="{{ url_for('add_recipe', group_id=group.id) }}">+ Post a Recipe</a>
 {% elif group.privacy_setting == 'public' %}
   <form method="POST" action="{{ url_for('request_join', group_id=group.id) }}">
+    <button type="submit">Join Group</button>
+  </form>
+{% elif can_request %}
+  <p><strong>{{ group.group_name }} created by {{ creator_username or 'Unknown' }}.</strong></p>
+  <p>This is a private group.</p>
+  <form method="POST" action="{{ url_for('request_join', group_id=group.id) }}">
     <button type="submit">Request to Join</button>
   </form>
 {% endif %}
 
+{% if membership or group.privacy_setting == 'public' %}
 <h2>Recipes</h2>
 {% if recipes %}
   <ul>

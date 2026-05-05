@@ -37,6 +37,11 @@
     </p>
 
     <p>
+        <strong>Posting to group:</strong> {{ group.group_name }}
+    </p>
+    <input type="hidden" name="group_id" value="{{ group.id }}">
+
+    <p>
         {{ form.num_serves.label }}<br>
         {{ form.num_serves(size=32) }}
     </p>
@@ -44,14 +49,6 @@
     <p>
         {{ form.privacy.label }}<br>
         {{ form.privacy() }}
-    </p>
-
-    <p id="group-select-container" style="display:none;">
-        {{ form.group_id.label }}<br>
-        {{ form.group_id() }}
-        {% for error in form.group_id.errors %}
-            <span style="color:red; display:block;">{{ error }}</span>
-        {% endfor %}
     </p>
 
     <p>

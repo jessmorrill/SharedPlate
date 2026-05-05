@@ -85,17 +85,21 @@ def recipe_detail(recipe_id):
 @app.route('/create-recipe', methods=['GET', 'POST'])
 def add_recipe():
     user = get_current_user()
-    form = CreateRecipe()
-    user_groups = []
-    if user:
-        user_groups = Group.query.join(Group_Membership).filter(Group_Membership.user_email == user.email).all()
-    form.group_id.choices = [('', 'Select a group')] + [(str(g.id), g.group_name) for g in user_groups]
+    if not user:
+        return redirect(url_for('login'))
 
-    group_id = request.args.get('group_id')
-    if request.method == 'GET' and group_id:
+    group_id = request.args.get('group_id') if request.method == 'GET' else request.form.get('group_id')
+    if not group_id:
+        return redirect(url_for('home'))
+
+    group = Group.query.get_or_404(group_id)
+    membership = Group_Membership.query.filter_by(user_email=user.email, group_id=group.id).first()
+    if not membership:
+        return redirect(url_for('group_detail', group_id=group.id, group_name=group.group_name))
+
+    form = CreateRecipe()
+    if request.method == 'GET':
         form.privacy.data = 'private'
-        if str(group_id) in [choice[0] for choice in form.group_id.choices]:
-            form.group_id.data = str(group_id)
 
     if form.validate_on_submit():
         title = form.title.data
@@ -105,14 +109,10 @@ def add_recipe():
         num_serves = form.num_serves.data
         privacy = form.privacy.data
         category = form.category.data
-        selected_group_id = int(form.group_id.data) if form.group_id.data else 1
-        if privacy == 'private' and not form.group_id.data:
-            form.group_id.errors.append('Please select a group for group-only recipes.')
-            return render_template('add.html', form=form)
 
         c = Recipe(
             user_email=session.get('user'),
-            group_id=selected_group_id,
+            group_id=group.id,
             title=title,
             prep_time=prep_time,
             cook_time=cook_time,
@@ -135,8 +135,9 @@ def add_recipe():
                 )
                 db.session.add(i)
         db.session.commit()
-        return redirect(url_for('add_recipe'))
-    return render_template('add.html', form=form)
+        return redirect(url_for('group_detail', group_id=group.id, group_name=group.group_name))
+
+    return render_template('add.html', form=form, group=group)
 
 
 @app.route('/create-group', methods=['GET', 'POST'])
@@ -161,6 +162,21 @@ def add_group():
         db.session.commit()
         return redirect(url_for('add_group'))
     return render_template('create_group.html', form=form)
+
+
+@app.route('/join-group', methods=['GET', 'POST'])
+def join_group():
+    user = get_current_user()
+    if not user:
+        return redirect(url_for('login'))
+    form = SearchGroup(request.args if request.method == 'GET' else request.form)
+    query = form.searchB.data.strip() if form.searchB.data else ''
+    group_query = Group.query
+    if query:
+        group_query = group_query.filter(Group.group_name.ilike(f"%{query}%"))
+    groups = group_query.all()
+    membership_ids = [m.group_id for m in Group_Membership.query.filter_by(user_email=user.email).all()]
+    return render_template('join_group.html', form=form, groups=groups, membership_ids=membership_ids)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -299,10 +315,14 @@ def group_detail(group_id, group_name):
         return redirect(url_for('login'))
     group = Group.query.get_or_404(group_id)
     membership = Group_Membership.query.filter_by(user_email=user.email, group_id=group.id).first()
-    if not membership and group.privacy_setting != 'public':
-        return redirect(url_for('home'))
+    creator_membership = Group_Membership.query.filter_by(group_id=group.id, role='creator').first()
+    creator_username = None
+    if creator_membership:
+        creator_username = creator_membership.user.username
+    if not membership and group.privacy_setting == 'private':
+        return render_template('group_page.html', group=group, membership=None, can_request=True, creator_username=creator_username)
     recipes = Recipe.query.filter_by(group_id=group.id).all()
-    return render_template('group_page.html', group=group, recipes=recipes, membership=membership)
+    return render_template('group_page.html', group=group, recipes=recipes, membership=membership, can_request=(not membership and group.privacy_setting=='public'), creator_username=creator_username)
 
 @app.route('/group/<int:group_id>/request_join', methods=['POST'])
 def request_join(group_id):
@@ -310,11 +330,23 @@ def request_join(group_id):
     if not user:
         return redirect(url_for('login'))
     group = Group.query.get_or_404(group_id)
-    if group.privacy_setting != 'public':
-        return redirect(url_for('home'))
     existing_membership = Group_Membership.query.filter_by(user_email=user.email, group_id=group.id).first()
     if existing_membership:
         return redirect(url_for('group_detail', group_id=group.id, group_name=group.group_name))
+
+    if group.privacy_setting == 'public':
+        membership = Group_Membership(
+            user_email=user.email,
+            group_id=group.id,
+            role='member',
+            notify_if_review=True,
+            notify_if_fork=True,
+            notify_if_change=True
+        )
+        db.session.add(membership)
+        db.session.commit()
+        return redirect(url_for('group_detail', group_id=group.id, group_name=group.group_name))
+
     existing_request = JoinRequest.query.filter_by(user_email=user.email, group_id=group.id, status='pending').first()
     if existing_request:
         return redirect(url_for('group_detail', group_id=group.id, group_name=group.group_name))
