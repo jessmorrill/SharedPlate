@@ -145,7 +145,8 @@ def submit_review(recipe_id):
     existing_review = Review.query.filter_by(user_email=user.email, recipe_id=recipe_id).first()
     if existing_review:
         return redirect(url_for('recipe_detail', recipe_id=recipe_id))
-    if user.email == recipe.user_email:
+    is_author = Recipe.query.filter_by(id=recipe_id, user_email=user.email).first() is not None
+    if is_author:    
         return redirect(url_for('recipe_detail', recipe_id=recipe_id))
     title = request.form.get('title', '').strip()
     rating = request.form.get('rating')
