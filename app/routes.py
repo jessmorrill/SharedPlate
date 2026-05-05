@@ -130,7 +130,6 @@ def add_recipe():
         body = form.body.data
         num_serves = form.num_serves.data
         privacy = form.privacy.data
-        category = form.category.data
 
         c = Recipe(
             user_email=session.get('user'),
@@ -139,7 +138,6 @@ def add_recipe():
             prep_time=prep_time,
             cook_time=cook_time,
             body=body,
-            category=category,
             num_serves=num_serves,
             privacy_setting=privacy,
             is_validated=True,
