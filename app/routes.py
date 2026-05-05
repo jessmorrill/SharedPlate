@@ -5,7 +5,7 @@ from app.forms import CreateRecipe, SearchRecipe, CreateGroup, SearchGroup
 from app.models import Recipe, Ingredient, Group, User, Group_Membership, JoinRequest, Invite
 from datetime import datetime
 import random
-
+import pdb
 
 def get_current_user():
     email = session.get('user')
@@ -194,6 +194,62 @@ def dashboard():
     pending_invites = Invite.query.filter_by(invitee_email=user.email, status='pending').all()
     return render_template('dashboard.html', user=user, recipes=recipes, groups=groups, pending_requests=pending_requests, pending_invites=pending_invites)
 
+@app.route('/group/<int:group_id>-<string:group_name>')
+def group_detail(group_id, group_name):
+    user = get_current_user()
+    if not user:
+        return redirect(url_for('login'))
+    group = Group.query.get_or_404(group_id)
+    membership = Group_Membership.query.filter_by(user_email=user.email, group_id=group.id).first()
+    if not membership and group.privacy_setting != 'public':
+        return redirect(url_for('home'))
+    recipes = Recipe.query.filter_by(group_id=group.id).all()
+    return render_template('group_page.html', group=group, recipes=recipes, membership=membership)
+
+@app.route('/group/<int:group_id>/request_join', methods=['POST'])
+def request_join(group_id):
+    user = get_current_user()
+    if not user:
+        return redirect(url_for('login'))
+    group = Group.query.get_or_404(group_id)
+    if group.privacy_setting != 'public':
+        return redirect(url_for('home'))
+    existing_membership = Group_Membership.query.filter_by(user_email=user.email, group_id=group.id).first()
+    if existing_membership:
+        return redirect(url_for('group_detail', group_id=group.id, group_name=group.group_name))
+    existing_request = JoinRequest.query.filter_by(user_email=user.email, group_id=group.id, status='pending').first()
+    if existing_request:
+        return redirect(url_for('group_detail', group_id=group.id, group_name=group.group_name))
+
+    request_obj = JoinRequest(
+        user_email=user.email,
+        group_id=group.id,
+        date_requested=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    )
+    db.session.add(request_obj)
+    db.session.commit()
+    creator_membership = Group_Membership.query.filter_by(group_id=group.id, role='creator').first()
+    if creator_membership:
+        creator = User.query.filter_by(email=creator_membership.user_email).first()
+        if creator:
+            msg = Message('Join Request for Your Group', recipients=[creator.email])
+            msg.body = f'{user.username} has requested to join your group "{group.group_name}".\n\nTo manage this request, visit: {url_for("manage_requests", group_id=group.id, _external=True)}'
+            mail.send(msg)
+
+    return redirect(url_for('group_detail', group_id=group.id, group_name=group.group_name))
+
+@app.route('/group/<int:group_id>/manage_requests')
+def manage_requests(group_id):
+    user = get_current_user()
+    if not user:
+        return redirect(url_for('login'))
+    group = Group.query.get_or_404(group_id)
+    membership = Group_Membership.query.filter_by(user_email=user.email, group_id=group.id).first()
+    if not membership or membership.role != 'creator':
+        return redirect(url_for('home'))
+    requests = JoinRequest.query.filter_by(group_id=group.id, status='pending').all()
+    return render_template('manage_requests.html', group=group, requests=requests)
+
 @app.route('/group/<int:group_id>/add_members', methods=['GET', 'POST'])
 def add_members(group_id):
     user = get_current_user()
@@ -360,3 +416,4 @@ def deny_request(group_id, request_id):
     db.session.commit()
     
     return redirect(url_for('dashboard'))
+
