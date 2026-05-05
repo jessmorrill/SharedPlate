@@ -13,13 +13,13 @@
 <a href="{{ url_for('join_group') }}">Join Group</a>
 {% if session.get('user') %}
 <a href="{{ url_for('logout') }}">Logout</a>
-<a href="{{ url_for('dashboard') }}" style="color:white; margin-left:80%;">
+<a href="{{ url_for('dashboard') }}" style="color:white;">
     {{ current_user.username if current_user else session['user'] }}
 </a>
 {% endif %}
 </div>
-<div class="content">
-    {% block content %}{% end block %}
+<div class="container">
+    {% block content %}{% endblock %}
 </div>
 <footer>
       <div class="container">
@@ -30,9 +30,8 @@
       {% endfor %}
     {% endif %}
   {% endwith %}
-  {% block content %}{% endblock %}
     </div>  
-    <h6>SharedPlate by The CCs</h6>
+    <h5 class="footer">SharedPlate by The CCs</h5>
 </footer>
 </body>
 </html>
